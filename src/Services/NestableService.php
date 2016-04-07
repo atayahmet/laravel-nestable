@@ -1,4 +1,4 @@
-<?php namespace Services;
+<?php namespace Nestable\Services;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as Collect;

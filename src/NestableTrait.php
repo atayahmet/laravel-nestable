@@ -1,4 +1,4 @@
-<?php
+<?php namespace Nestable;
 
 use Illuminate\Database\Eloquent\Collection;
 use Nestable\Service\NestableService;

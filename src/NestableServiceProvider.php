@@ -1,4 +1,4 @@
-<?php
+<?php namespace Nestable;
 
 use Illuminate\Support\ServiceProvider;
 
