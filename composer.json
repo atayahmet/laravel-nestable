@@ -1,7 +1,6 @@
 {
     "name": "atayahmet/nestable",
     "type": "library",
-    "version": "0.1.0",
     "description": "Laravel nested categories library",
     "homepage": "https://github.com/atayahmet/nestable",
     "keywords": ["nested","nestable","nestedset","category"],
@@ -17,11 +16,13 @@
 
     "require": {
         "php": ">=5.5.5",
+        "illuminate/support": "5.2.*",
+        "illuminate/database": "5.2.*"
     },
 
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "Nestable\\": "src/"
         }
     }
 }
