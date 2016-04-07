@@ -1,7 +1,5 @@
 <?php
 
-namespace Nestable;
-
 use Illuminate\Support\ServiceProvider;
 
 class NestableServiceProvider extends ServiceProvider
