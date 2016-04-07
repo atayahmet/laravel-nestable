@@ -1,9 +1,9 @@
 {
-    "name": "atayahmet/nestable",
+    "name": "atayahmet/laravel-nestable",
     "type": "library",
-    "description": "Laravel nested categories library",
+    "description": "Laravel 5 nested categories library",
     "homepage": "https://github.com/atayahmet/nestable",
-    "keywords": ["nested","nestable","nestedset","category"],
+    "keywords": ["nested","nestable","nestedset","category","laravel"],
     "license": "MIT",
     "authors": [
         {
