@@ -12,7 +12,7 @@ class NestableServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/config/nestable.php' => config_path('nestable.php'),
+            __DIR__.'/../config/nestable.php' => config_path('nestable.php'),
         ]);
     }
 
@@ -24,9 +24,9 @@ class NestableServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/config/nestable.php', 'nestable'
+            __DIR__.'/../config/nestable.php', 'nestable'
         );
 
-        $this->app->bind('nestableservice', 'GC\Services\Nestable\NestableService');
+        $this->app->bind('nestableservice', 'Nestable\Services\NestableService');
     }
 }
