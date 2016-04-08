@@ -1,7 +1,7 @@
 <?php namespace Nestable;
 
 use Illuminate\Database\Eloquent\Collection;
-use Nestable\Service\NestableService;
+use Nestable\Services\NestableService;
 
 trait NestableTrait {
 
