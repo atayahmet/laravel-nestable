@@ -217,7 +217,7 @@ class NestableService {
         }
 
         // if pass array data to selected method procces will generate multiple dropdown menu.
-        if($first && ($this->selected !== false || $this->multiple == true)) {
+        if($first && (is_array($this->selected) || $this->multiple == true)) {
             $tree .= ' multiple';
         }
 
