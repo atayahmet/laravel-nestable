@@ -29,6 +29,7 @@ That's it!
 Suppose that the data came from a database as follows.
 
 Category table:
+
 id | parent_id | name           | slug
 ---| --------- | -------------- | -------
 1  | 0         | T-shirts       | t-shirts
@@ -301,6 +302,7 @@ $result->toArray();
 ```
 
 Methods for standalone:
+
 name        | type      | description              |
 ------------| --------- |------------------------- |
 toArray()   | function  | Array output             |
