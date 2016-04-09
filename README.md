@@ -1,7 +1,12 @@
 Laravel Nestable
 ========
 
-##Install
+Laravel Nestable to work with recursive logic. Category level there is no limit but
+this may vary depending on your server performance. Allow the 100000 recursion process execution since PHP 5.2. [More info](#http://php.net/manual/en/pcre.configuration.php#ini.pcre.recursion-limit)
+
+Install
+---
+
 ```ssh
 composer require atayahmet/laravel-nestable
 ```
@@ -20,11 +25,12 @@ Then add **app.php** Facade file again.
 
 Finally run the artisan command:
 ```ssh
-php artisan vendor:publish
+php artisan vendor:publish --provider="Nestable\NestableServiceProvider"
 ```
 That's it!
 
-##Basic Usage with Eloquent
+Basic Usage with Eloquent
+---
 
 Suppose that the data came from a database as follows.
 
@@ -62,8 +68,7 @@ class Category extends \Eloquent {
 ```php
 <?php
 
-    $category = new Category;
-    $result = $category->nested()->get();
+    $result = Category::nested()->get();
 ```
 Query result:
 
@@ -123,7 +128,7 @@ For html tree output:
 ```php
 <?php
 
-$category->nested(Category::$toHtml)->get();
+Category::nested(Category::$toHtml)->get();
 ```
 
 Output:
@@ -152,10 +157,9 @@ For dropdown tree output:
 ```php
 <?php
 
-$category
+Category::nested(Category::$toDropdown)
     ->attr(['name' => 'categories'])
     ->selected(2)
-    ->nested(Category::$toDropdown)
     ->get();
 ```
 
@@ -178,39 +182,47 @@ Selected for multiple list box:
 ->selected([1,2,3])
 ```
 
-##Output types
-name                  | type    |
-----------------------| ------- |
-{model}::$toArray     | array   |
-{model}::$toJson      | json    |
-{model}::$toHtml      | html    |
-{model}::toDropdown   | dropdown|
+Output types
+---
 
-##Method References
-name                  | paremeter| description                      |
-----------------------| -------- | -------------------------------- |
-nested()              | int      | Query result will return as nested|
-parent()              | int      | Reference the category starts|
-selected()            | int/array| Selected item(s) for dropdown/listbox                |
-multiple()            | none     | Generate multiple listbox |
-attr()                | array    | Dropdown/listbox attributes                  |
+name                  | type    
+----------------------| -------
+{model}::$toArray     | array   
+{model}::$toJson      | json    
+{model}::$toHtml      | html    
+{model}::toDropdown   | dropdown
+
+Method References
+---
+
+name                  | paremeter| description                      
+----------------------| -------- | --------------------------------
+nested()              | int      | Query result will return as nested
+parent()              | int      | Reference the category starts
+selected()            | int/array| Selected item(s) for dropdown/listbox                
+multiple()            | none     | Generate multiple listbox
+attr()                | array    | Dropdown/listbox attributes                  
+route()               | array    | Generate url by route name                  
 
 
-##Configuration
+Configuration
+---
+
 The above examples were performed with default settings.
 Config variables in **config/nestable.php** file.
 
-name                  | type    | description                      |
-----------------------| ------- | -------------------------------- |
-parent                | string  | Parent category column name      |
-primary_key           | string  | Table primary key                |
-generate_url          | boolean | Generate the url for html output |
-childNode             | string  | Child node name                  |
-[body](#body)         | array   | Array output (default)           |
-[html](#html)         | array   | Html output columns              |
-[dropdown](#dropdown) | array   | Dropdown/Listbox output          |
+name                  | type    | description                      
+----------------------| ------- | --------------------------------
+parent                | string  | Parent category column name      
+primary_key           | string  | Table primary key                
+generate_url          | boolean | Generate the url for html output
+childNode             | string  | Child node name                  
+[body](#body)         | array   | Array output (default)           
+[html](#html)         | array   | Html output columns              
+[dropdown](#dropdown) | array   | Dropdown/Listbox output          
 
-###body:
+body:
+---
 
 The body variable should be an array and absolutely customizable.
 
@@ -225,13 +237,15 @@ Example:
 ]
 ```
 
-###html
+html
+----
+
 Configuration for html output.
 
-name         | description       |
--------------| ----------------- |
-label        | Label column name |
-href         | Url column name   |
+name         | description       
+-------------| -----------------
+label        | Label column name
+href         | Url column name   
 
 Example:
 ```php
@@ -243,14 +257,16 @@ Example:
 ]
 ```
 
-###dropdown
+dropdown
+----
+
 Configuration for dropdown/listbox output.
 
-name   | description         |
--------| ------------------- |
-prefix | Label prefix        |
-label  | Label column name   |
-value  | Value column name   |
+name   | description         
+-------| -------------------
+prefix | Label prefix        
+label  | Label column name   
+value  | Value column name   
 
 Example:
 
@@ -303,13 +319,14 @@ $result->toArray();
 
 Methods for standalone:
 
-name        | type      | description              |
-------------| --------- |------------------------- |
-toArray()   | function  | Array output             |
-toJson()    | function  | Json string output       |
-toHtml()    | function  | Html output              |
-toDropdown()| function  | Dropdown/listbox output  |
-parent()              | int      | Reference the category starts|
-selected()            | int/array| Selected item(s) for dropdown/listbox                |
-multiple()            | none     | Generate multiple listbox |
-attr()                | array    | Dropdown/listbox attributes  
+name        | parameters      | description              
+------------| --------- |-------------------------
+parent()    | int      | Reference the category starts
+selected()  | int/array| Selected item(s) for dropdown/listbox               
+multiple()  | none     | Generate multiple listbox
+attr()      | array    | Dropdown/listbox attributes  
+route()     | array    | Generate url by route name                  
+toArray()   | none  | Array output             
+toJson()    | none  | Json string output       
+toHtml()    | none  | Html output              
+toDropdown()| none  | Dropdown/listbox output  
