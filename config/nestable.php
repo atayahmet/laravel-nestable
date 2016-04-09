@@ -3,8 +3,7 @@
 return [
     'parent'=> 'parent_id',
     'primary_key' => 'id',
-    'cache' => false,
-    'generate_url'   => false,
+    'generate_url'   => true,
     'childNode' => 'child',
     'body' => [
         'id',
