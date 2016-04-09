@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as Collect;
+use URL;
 use InvalidArgumentException;
 
 class NestableService {
@@ -47,6 +48,8 @@ class NestableService {
      * @var object Illuminate\Support\Collection
      */
     protected $data;
+
+    protected $route = false;
 
     /**
      * Set the data to wrap class
@@ -167,7 +170,7 @@ class NestableService {
 
                 $currentData = [
                     'label' => $child_item[$this->config['html']['label']],
-                    'href' => $child_item[$this->config['html']['href']]
+                    'href' => $this->url($child_item[$this->config['html']['href']])
                 ];
 
                 // open the li tag
@@ -424,11 +427,53 @@ class NestableService {
         }
     }
 
+    /**
+     * Save the parameters
+     *
+     * @param  array $params
+     * @return void
+     */
     public function save(array $params)
     {
         foreach($params as $method => $param) {
             $this->{$method}($param);
         }
+    }
+
+    /**
+     * URL Generator
+     *
+     * @param  string $path
+     * @return string
+     */
+    protected function url($path)
+    {
+        if($this->config['generate_url']) {
+
+            if($this->route) {
+
+                $param = current($this->route);
+                $name = key($this->route);
+
+                return URL::route($name, [$param => $path]);
+
+            }
+
+            return URL::to($path);
+        }
+
+        return '/'.$path;
+    }
+
+    /**
+     * Route generator
+     *
+     * @param  array $route
+     * @return void
+     */
+    public function route($route)
+    {
+        $this->route = $route;
     }
 
     /**

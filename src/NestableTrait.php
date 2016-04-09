@@ -9,7 +9,7 @@ trait NestableTrait {
      * Start the nested process
      * @var mixed
      */
-    protected $nested = false;
+    protected static $nested = false;
 
     /**
      * Soruce data
@@ -51,7 +51,7 @@ trait NestableTrait {
      * Default service number (toArray)
      * @var integer
      */
-    protected $to = 1;
+    protected static $to = 1;
 
     /**
      * Set the nest type
@@ -59,12 +59,12 @@ trait NestableTrait {
      * @param  integer $to
      * @return object
      */
-    public function nested($to = 1)
+    public static function nested($to = 1)
     {
-        $this->to = $to;
-        $this->nested = is_numeric($to) ? $to : false;
+        static::$to = $to;
+        static::$nested = is_numeric($to) ? $to : false;
 
-        return $this;
+        return new self;
     }
 
     /**
@@ -76,11 +76,11 @@ trait NestableTrait {
     {
         $this->source = parent::get();
 
-        if(! $this->nested) {
+        if(! static::$nested) {
             return $this->source;
         }
 
-        return $this->to($this->to);
+        return $this->to(static::$to);
     }
 
     /**
@@ -90,16 +90,16 @@ trait NestableTrait {
      */
     protected function to()
     {
-        if($this->to === 1) {
+        if(static::$to === 1) {
             $method = 'toArray';
         }
-        elseif($this->to === 2) {
+        elseif(static::$to === 2) {
             $method = 'toJson';
         }
-        elseif($this->to === 3) {
+        elseif(static::$to === 3) {
             $method = 'toHtml';
         }
-        elseif($this->to === 4) {
+        elseif(static::$to === 4) {
             $method = 'toDropdown';
         }else{
             return $this->source;
