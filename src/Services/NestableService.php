@@ -474,6 +474,8 @@ class NestableService {
     public function route($route)
     {
         $this->route = $route;
+
+        return $this;
     }
 
     /**
