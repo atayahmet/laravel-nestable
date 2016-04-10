@@ -1,4 +1,4 @@
-Laravel Nestable
+Laravel 5 Nestable
 ========
 
 Laravel Nestable to work with recursive logic. Category level there is no limit but
@@ -68,67 +68,66 @@ class Category extends \Eloquent {
 ```php
 <?php
 
-    $result = Category::nested()->get();
+$categories = Category::nested()->get();
 ```
 Query result:
 
 ```php
 <?php
-    dd($result);
 
-    array:6 [
+array:6 [
+      0 => array:5 [
+        "id" => 1
+        "name" => "T-shirts"
+        "slug" => "t-shirts"
+        "child" => array:2 [
           0 => array:5 [
-            "id" => 1
-            "name" => "T-shirts"
-            "slug" => "t-shirts"
-            "child" => array:2 [
-              0 => array:5 [
-                "id" => 2
-                "name" => "Red T-shirts"
-                "slug" => "red-t-shirts"
-                "child" => []
-                "parent_id" => 1
-              ]
-              1 => array:5 [
-                "id" => 3
-                "name" => "Black T-shirts"
-                "slug" => "black-t-shirts"
-                "child" => []
-                "parent_id" => 1
-              ]
-            ]
-            "parent_id" => 0
+            "id" => 2
+            "name" => "Red T-shirts"
+            "slug" => "red-t-shirts"
+            "child" => []
+            "parent_id" => 1
           ]
           1 => array:5 [
-            "id" => 4
-            "name" => "Sweaters"
-            "slug" => "sweaters"
-            "child" => array:2 [
-              0 => array:5 [
-                "id" => 5
-                "name" => "Red Sweaters"
-                "slug" => "red-sweaters"
-                "child" => []
-                "parent_id" => 4
-              ]
-              1 => array:5 [
-                "id" => 6
-                "name" => "Blue Sweaters"
-                "slug" => "blue-sweaters"
-                "child" => []
-                "parent_id" => 4
-              ]
-            ]
-            "parent_id" => 0
+            "id" => 3
+            "name" => "Black T-shirts"
+            "slug" => "black-t-shirts"
+            "child" => []
+            "parent_id" => 1
+          ]
         ]
+        "parent_id" => 0
+      ]
+      1 => array:5 [
+        "id" => 4
+        "name" => "Sweaters"
+        "slug" => "sweaters"
+        "child" => array:2 [
+          0 => array:5 [
+            "id" => 5
+            "name" => "Red Sweaters"
+            "slug" => "red-sweaters"
+            "child" => []
+            "parent_id" => 4
+          ]
+          1 => array:5 [
+            "id" => 6
+            "name" => "Blue Sweaters"
+            "slug" => "blue-sweaters"
+            "child" => []
+            "parent_id" => 4
+          ]
+        ]
+        "parent_id" => 0
     ]
+]
 ```
 For html tree output:
 
 ```php
 <?php
 
-Category::nested(Category::$toHtml)->get();
+Category::renderAsHtml()->get();
 ```
 
 Output:
@@ -152,12 +151,12 @@ Output:
 </ul>
 ```
 
-For dropdown tree output:
+For dropdown output:
 
 ```php
 <?php
 
-Category::nested(Category::$toDropdown)
+Category::renderAsDropdown()
     ->attr(['name' => 'categories'])
     ->selected(2)
     ->get();
@@ -182,28 +181,185 @@ Selected for multiple list box:
 ->selected([1,2,3])
 ```
 
-Output types
+Output methods
 ---
 
-name                  | type    
-----------------------| -------
-{model}::$toArray     | array   
-{model}::$toJson      | json    
-{model}::$toHtml      | html    
-{model}::toDropdown   | dropdown
+name                  | Parameter |output    
+----------------------| --------- | -------
+renderAsArray()       | none      | array   
+renderAsJson()        | none      | json    
+renderAsHtml()        | none      | html    
+renderAsDropdown()    | none      | dropdown
+renderAsDropdown()    | none      | Listbox
 
-Method References
+Usable methods with output methods
 ---
 
+renderAsArray()
+---
 name                  | paremeter| description                      
 ----------------------| -------- | --------------------------------
-nested()              | int      | Query result will return as nested
-parent()              | int      | Reference the category starts
-selected()            | int/array| Selected item(s) for dropdown/listbox                
-multiple()            | none     | Generate multiple listbox
-attr()                | array    | Dropdown/listbox attributes                  
-route()               | array    | Generate url by route name                  
+[parent()](#parent)   | int      | Get childs of the defined parent
 
+renderAsJson()
+---
+name                  | paremeter| description                      
+----------------------| -------- | --------------------------------
+[parent()](#parent)   | int      | Get childs of the defined parent
+
+renderAsHtml()
+---
+name                  | paremeter         | description                      
+----------------------| ----------------- | --------------------------------
+[parent()](#parent)   | int               | Get childs of the defined parent
+[active()](#active)   | callback/array/int| Selected item(s) for html output               
+[route()](#route)     | callback/array    | Generate url by route name
+
+renderAsDropdown()/renderAsMultiple()
+---
+name                  | paremeter         | description                      
+----------------------| ----------------- | --------------------------------
+[parent()](#parent)   | int               | Get childs of the defined parent
+[selected()](#selected)| callback/array/int| Selected item(s) for dropdown  
+[attr()](#attr)        | array             | Dropdown/listbox attributes
+
+
+
+parent()
+---
+Get childs of the defined parent.
+
+```php
+<?php
+
+Category::parent(2)->renderAsArray()->get();
+```
+>**Note:** This methods usable all with output methods
+
+active()
+---
+Selected item(s) for html output.
+
+Example 1:
+```php
+<?php
+
+Menu::active('t-shirts')->renderAsHtml()->get();
+```
+
+Example 2:
+```php
+<?php
+
+Menu::active('t-shirts', 'black-t-shirts')->renderAsHtml()->get();
+```
+
+Example 3:
+```php
+<?php
+
+Menu::active(['t-shirts', 'black-t-shirts'])->renderAsHtml()->get();
+```
+
+Example 4:
+```php
+<?php
+
+Menu::active(function($li, $href, $label) {
+
+    $li->addAttr('class', 'active')->addAttr('data-label', $label);
+
+})->renderAsHtml()->get();
+```
+
+Example 5:
+```php
+<?php
+
+Menu::active(function($li, $href, $label) {
+
+    $li->addAttr(['class' => 'active', 'data-label' => $label]);
+
+})->renderAsHtml()->get();
+```
+
+route()
+---
+
+Generate url by route name
+
+Example 1:
+```php
+<?php
+
+Menu::route(['product' => 'slug'])->renderAsHtml()->get();
+
+```
+>**Note:** **product** refer to route name and **slug** refer to paremeter name.
+
+```php
+<?php
+
+Route::get('product/{slug}', 'ProductController@show');
+```
+
+Example 2:
+```php
+<?php
+
+Menu::route(function($href, $label) {
+
+    return \URL::to($href);
+
+})->renderAsHtml()->get();
+```
+
+selected()
+---
+Selected item(s) for dropdown.
+
+Example 1:
+```php
+<?php
+
+Category::selected(1)->renderAsDropdown()->get();
+```
+
+Example 2:
+```php
+<?php
+
+Category::selected(1,5)->renderAsMultiple()->get();
+```
+
+Example 3:
+```php
+<?php
+
+Category::selected([1,3])->renderAsMultiple()->get();
+```
+
+Example 4:
+```php
+<?php
+
+Category::selected(function($option, $value, $label) {
+
+    $option->addAttr('selected', 'true');
+    $option->addAttr(['data-item' => $label]);
+
+})->renderAsMultiple()->get();
+```
+
+attr()
+---
+Dropdown/listbox attributes.
+
+```php
+<?php
+
+Category::attr(['name' => 'categories', 'class' => 'red'])->renderAsDropdown()->get();
+```
 
 Configuration
 ---
@@ -221,7 +377,7 @@ childNode             | string  | Child node name
 [html](#html)         | array   | Html output columns              
 [dropdown](#dropdown) | array   | Dropdown/Listbox output          
 
-body:
+body
 ---
 
 The body variable should be an array and absolutely customizable.
@@ -280,7 +436,8 @@ Example:
 ]
 ```
 
-##Standalone Usage From Model
+Using Independent Models
+---
 
 Include the Nestable facade.
 
@@ -314,19 +471,5 @@ $result = Nestable::make([
 
 For array output:
 ```php
-$result->toArray();
+$result->renderAsArray();
 ```
-
-Methods for standalone:
-
-name        | parameters      | description              
-------------| --------- |-------------------------
-parent()    | int      | Reference the category starts
-selected()  | int/array| Selected item(s) for dropdown/listbox               
-multiple()  | none     | Generate multiple listbox
-attr()      | array    | Dropdown/listbox attributes  
-route()     | array    | Generate url by route name                  
-toArray()   | none  | Array output             
-toJson()    | none  | Json string output       
-toHtml()    | none  | Html output              
-toDropdown()| none  | Dropdown/listbox output  

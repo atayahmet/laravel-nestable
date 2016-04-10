@@ -21,7 +21,7 @@ trait NestableTrait {
      * Service parameters
      * @var array
      */
-    protected $parameters = [];
+    protected static $parameters = [];
 
     /**
      * Array service
@@ -91,27 +91,77 @@ trait NestableTrait {
     protected function to()
     {
         if(static::$to === 1) {
-            $method = 'toArray';
+            $method = 'renderAsArray';
         }
         elseif(static::$to === 2) {
-            $method = 'toJson';
+            $method = 'renderAsJson';
         }
         elseif(static::$to === 3) {
-            $method = 'toHtml';
+            $method = 'renderAsHtml';
         }
         elseif(static::$to === 4) {
-            $method = 'toDropdown';
+            $method = 'renderAsDropdown';
         }else{
             return $this->source;
         }
 
         $nest = new NestableService;
-        $nest->save($this->parameters);
+        $nest->save(static::$parameters);
 
         $nestable = $nest->make($this->source);
 
         return call_user_func([$nestable, $method]);
 
+    }
+
+    /**
+     * Render as html
+     *
+     * @return string
+     */
+    public static function renderAsHtml()
+    {
+        return self::nested(static::$toHtml);
+    }
+
+    /**
+     * Render as array tree
+     *
+     * @return array
+     */
+    public static function renderAsArray()
+    {
+        return self::nested(static::$toArray);
+    }
+
+    /**
+     * Render as json string
+     *
+     * @return array
+     */
+    public static function renderAsJson()
+    {
+        return self::nested(static::$toJson);
+    }
+
+    /**
+     * Render as multiple list box
+     *
+     * @return string
+     */
+    public static function renderAsMultiple()
+    {
+        return self::multiple()->nested(static::$toDropdown);
+    }
+
+    /**
+     * Render as dropdown
+     *
+     * @return string
+     */
+    public static function renderAsDropdown()
+    {
+        return self::nested(static::$toDropdown);
     }
 
     /**
@@ -122,6 +172,30 @@ trait NestableTrait {
     protected function getParentField()
     {
         return property_exists($this, 'parent') ? $this->parent : 'parent_id';
+    }
+
+    /**
+     * Save the service parameters
+     *
+     * @param  string $method Method name in NestableService
+     * @param  mixed $value
+     * @return object
+     */
+    protected function saveParameter($method, $value)
+    {
+        static::$parameters[$method] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the all service parameters
+     *
+     * @return array
+     */
+    protected function getParameters()
+    {
+        return $this->paremeters;
     }
 
     /**
@@ -136,7 +210,8 @@ trait NestableTrait {
     {
         if(method_exists(NestableService::class, $method)) {
 
-            $this->parameters[$method] = current($args);
+            $args = count($args) > 1 ? $args : current($args);
+            static::saveParameter($method, $args);
 
             return $this;
         }
