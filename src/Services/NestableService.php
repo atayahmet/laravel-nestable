@@ -2,11 +2,14 @@
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as Collect;
-use URL;
 use InvalidArgumentException;
+use Nestable\MacrosTrait;
 use Closure;
+use URL;
 
 class NestableService {
+
+    use MacrosTrait;
 
     /**
      * configuration vars
@@ -60,8 +63,12 @@ class NestableService {
      * Collection data
      * @var object Illuminate\Support\Collection
      */
-    protected $data;
+    public $data = [];
 
+    /**
+     * Route parameters
+     * @var array
+     */
     protected $route = false;
 
     /**
@@ -566,6 +573,8 @@ class NestableService {
     public function route($route)
     {
         $this->route = $route;
+
+        return $this;
     }
 
     /**
@@ -612,6 +621,13 @@ class NestableService {
     public function closeLi($li)
     {
         return $li."</li>\n";
+    }
+
+    public function __call($method, $args)
+    {
+        if($this->hasMacro($method)) {
+            return $this->runMacro($method, $args);
+        }
     }
 
 }

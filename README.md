@@ -473,3 +473,41 @@ For array output:
 ```php
 $result->renderAsArray();
 ```
+
+Macros
+---
+
+```php
+<?php
+
+Nestable::macro('helloWorld', function($nest, $categories) {
+
+    return $nest->make($categories)->active('sweater')->route(['tests' => 'slug'])->renderAsHtml();
+
+});
+```
+
+Call the above macro:
+
+```php
+<?php
+
+$categories = [
+
+    [
+        'id'        => 1,
+        'parent_id' => 0,
+        'name'      => 'T-shirt',
+        'slug'      => 'T-shirt'
+    ],
+    [
+        'id'        => 2,
+        'parent_id' => 0,
+        'name'      => 'Sweater',
+        'slug'      => 'sweater'
+    ]
+
+];
+
+Nestable::helloWorld($categories);
+```
