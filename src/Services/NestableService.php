@@ -338,8 +338,14 @@ class NestableService {
      * @param  object  $data  Illuminate\Support\Collection as Collect
      * @return boolean
      */
-    public function hasChild($key, $value, Collect $data)
+    public function hasChild($key = null, $value = null, Collect $data = null)
     {
+        if(count(func_num_args()) < 3) {
+            $data = $this->data;
+            $key  = $this->parent;
+            $value = current(func_get_args());
+        }
+
         $child = false;
 
         $data->each(function($item) use(&$child, $key, $value){
@@ -634,6 +640,12 @@ class NestableService {
      */
     public function isValid($type, $render = false)
     {
+        $original = $type;
+
+        if(in_array($type, ['json', 'array'])) {
+            $type = 'body';
+        }
+
         $fields = $this->config[$type];
         $valid  = true;
 
@@ -651,7 +663,7 @@ class NestableService {
 
         // render data
         if($valid && $render) {
-            return call_user_func([$this, 'renderAs'.ucfirst($type)]);
+            return call_user_func([$this, 'renderAs'.ucfirst($original)]);
         }
 
         return $valid;
