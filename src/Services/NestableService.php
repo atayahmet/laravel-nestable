@@ -85,7 +85,7 @@ class NestableService {
         elseif(is_array($data)) {
             $this->data = collect($data);
         }else{
-            throw new InvalidArgumentException("Invalid data type. ");
+            throw new InvalidArgumentException("Invalid data type.");
         }
 
         $this->config = config('nestable');
@@ -96,6 +96,8 @@ class NestableService {
 
         return $this;
     }
+
+
 
     /**
      * Pass to array of all data as nesting
@@ -623,10 +625,51 @@ class NestableService {
         return $li."</li>\n";
     }
 
+    /**
+     * Array validator
+     *
+     * @param  string  $type
+     * @param  boolean  $return
+     * @return mixed
+     */
+    public function isValid($type, $render = false)
+    {
+        $fields = $this->config[$type];
+        $valid  = true;
+
+        // mapping all data
+        $this->data->map(function($item) use($fields, &$valid) {
+
+            foreach($fields as $field) {
+
+                if($valid) {
+                    $valid = isset($item[$field]);
+                }
+            }
+
+        });
+
+        // render data
+        if($valid && $render) {
+            return call_user_func([$this, 'renderAs'.ucfirst($type)]);
+        }
+
+        return $valid;
+    }
+
     public function __call($method, $args)
     {
         if($this->hasMacro($method)) {
             return $this->runMacro($method, $args);
+        }
+
+        elseif(preg_match('/^isValid/', $method)) {
+
+            preg_match('/For(.*?)$/', $method, $matches);
+
+            if(count($matches) > 1) {
+                return $this->isValid(strtolower($matches[1]), current($args));
+            }
         }
     }
 

@@ -212,6 +212,7 @@ trait NestableTrait {
 
             $args = count($args) > 1 ? $args : current($args);
             static::saveParameter($method, $args);
+
             return $this;
         }
 

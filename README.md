@@ -419,7 +419,7 @@ dropdown
 Configuration for dropdown/listbox output.
 
 name   | description         
--------| -------------------
+------- | -------------------
 prefix | Label prefix        
 label  | Label column name   
 value  | Value column name   
@@ -472,6 +472,36 @@ $result = Nestable::make([
 For array output:
 ```php
 $result->renderAsArray();
+```
+
+Validators
+---
+It controls the structure of the data. They also made the rendering process with a second parameter control after they.
+
+name    | Parameters
+------- | -----------
+isValidForArray | boolean
+isValidForJson  | boolean
+isValidForHtml  | boolean
+isValidForDropdown| boolean
+isValidForMultiple | boolean
+
+**Example 1:**
+```php
+<?php
+
+Menu::make($categories)->isValidForHtml();
+
+// return true or false
+```
+
+**Example 2:**
+```php
+<?php
+
+Menu::make($categories)->isValidForHtml(true);
+
+// return html string if data valid
 ```
 
 Macros
