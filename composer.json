@@ -22,9 +22,9 @@
 
     "autoload": {
         "psr-4": {
-            "Nestable\\": "src/"
+            "Nestable\\": "src/",
+            "Nestable\\Tests\\": "tests/"
         }
     },
-
     "minimum-stability": "dev"
 }
