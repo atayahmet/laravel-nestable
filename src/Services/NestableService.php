@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use Nestable\MacrosTrait;
 use Closure;
 use URL;
+use Config;
 
 class NestableService {
 
@@ -88,7 +89,7 @@ class NestableService {
             throw new InvalidArgumentException("Invalid data type.");
         }
 
-        $this->config = config('nestable');
+        $this->config = Config::get('nestable');
 
         $this->parent = $this->config['parent'];
 
@@ -97,7 +98,34 @@ class NestableService {
         return $this;
     }
 
+    /**
+     * initialize parameters (toArray, toHtml, toDropdown)
+     *
+     * @param array $args
+     * @return void
+     */
+    protected function setParameters($args)
+    {
+        if(count($args) < 1) {
 
+            return [
+                'parent' => $this->parents ? current($this->parents) : 0,
+                'data'   => $this->data
+            ];
+        }
+
+        elseif(count($args) == 1) {
+            return [
+                'parent' => reset($args),
+                'data'   => $this->data
+            ];
+        }else{
+            return [
+                'data'   => reset($args),
+                'parent' => next($args)
+            ];
+        }
+    }
 
     /**
      * Pass to array of all data as nesting
@@ -115,8 +143,7 @@ class NestableService {
 
             $currentData = collect([]);
 
-            if($item[$this->parent] == $args['parent']) {
-
+            if(intval($item[$this->parent]) == intval($args['parent'])) {
                 // fill the array with the body fields
                 foreach($this->config['body'] as $field) {
                     $currentData->put($field, isset($item[$field]) ? $item[$field] : null);
@@ -130,13 +157,10 @@ class NestableService {
 
                 // Get the primary key name
                 $item_id = $item[$this->config['primary_key']];
-
                 // check the child element
                 if($this->hasChild($this->parent, $item_id, $args['data'])) {
-
                     // function call again for child elements
                     $currentData->put($child, $this->renderAsArray($args['data'], $item_id));
-
                 }
 
                 // current data push to global array
@@ -188,7 +212,7 @@ class NestableService {
 
             $childItems = '';
 
-            if($child_item[$this->parent] == $args['parent']) {
+            if(intval($child_item[$this->parent]) == intval($args['parent'])) {
 
                 $path = $child_item[$this->config['html']['href']];
                 $label = $child_item[$this->config['html']['label']];
@@ -203,7 +227,6 @@ class NestableService {
 
                 // open the li tag
                 $childItems .= $this->openLi($currentData, $activeItem);
-
                 // Get the primary key name
                 $item_id = $child_item[$this->config['primary_key']];
 
@@ -211,11 +234,16 @@ class NestableService {
                 if($this->hasChild($this->parent, $item_id, $args['data'])) {
 
                     // function call again for child elements
-                    $childItems .= $this->ul($this->renderAsHtml($args['data'], $item_id, false));
+                    $html = $this->renderAsHtml($args['data'], $item_id, false);
+
+                    if(!empty($html)) {
+                        $childItems .= $this->ul($html);
+                    }
                 }
 
                 // close the li tag
                 $childItems = $this->closeLi($childItems);
+                //dd($childItems);
 
             }
 
@@ -260,7 +288,7 @@ class NestableService {
 
             $childItems = '';
 
-            if($child_item[$this->parent] == $args['parent']) {
+            if(intval($child_item[$this->parent]) == intval($args['parent'])) {
 
                 // Get the value
                 $value = $child_item[$this->config['dropdown']['value']];
@@ -298,6 +326,11 @@ class NestableService {
         // close the select tag
         $tree = $first ? $tree.'</select>' : $tree;
         return $tree;
+    }
+
+    public function renderAsMultiple()
+    {
+        return $this->multiple()->renderAsDropdown();
     }
 
     /**
@@ -350,7 +383,7 @@ class NestableService {
 
         $data->each(function($item) use(&$child, $key, $value){
 
-            if($item[$key] == $value && ! $child) {
+            if(intval($item[$key]) == intval($value) && ! $child) {
                 $child = true;
             }
 
@@ -439,35 +472,6 @@ class NestableService {
         }
 
         return $this;
-    }
-
-    /**
-     * initialize parameters (toArray, toHtml, toDropdown)
-     *
-     * @param array $args
-     * @return void
-     */
-    protected function setParameters($args)
-    {
-        if(count($args) < 1) {
-
-            return [
-                'parent' => $this->parents ? current($this->parents) : 0,
-                'data'   => $this->data
-            ];
-        }
-
-        elseif(count($args) == 1) {
-            return [
-                'parent' => reset($args),
-                'data'   => $this->data
-            ];
-        }else{
-            return [
-                'data'   => reset($args),
-                'parent' => next($args)
-            ];
-        }
     }
 
     /**
