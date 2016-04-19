@@ -38,6 +38,19 @@ trait MacrosTrait {
     }
 
     /**
+     * Remove a macro
+     *
+     * @param  string $name Macro name
+     * @return void
+     */
+    public function removeMacro($name)
+    {
+        if($this->hasMacro($name)) {
+            unset($this->macros[$name]);
+        }
+    }
+
+    /**
      * Macro checker
      *
      * @param  string  $name
