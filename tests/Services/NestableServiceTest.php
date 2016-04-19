@@ -193,4 +193,14 @@ class NestableServiceTest extends TestCase {
 
         $this->assertRegExp('/'.$this->_get_pattern('dropdown').'/', $nested->isValidForDropdown(true));
     }
+
+    public function testIsValidForMultiple()
+    {
+        $nestable = new \Nestable\Services\NestableService;
+        $nested = $nestable->make($this->categories);
+
+        $this->assertTrue($nested->isValidForMultiple());
+
+        $this->assertRegExp('/'.$this->_get_pattern('multiple').'/', $nested->isValidForMultiple(true));
+    }
 }
