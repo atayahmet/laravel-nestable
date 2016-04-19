@@ -541,3 +541,29 @@ $categories = [
 
 Nestable::helloWorld($categories);
 ```
+
+Helper
+---
+
+```php
+<?php
+
+nestable($data)->renderAsHtml();
+```
+
+```php
+<?php
+
+nestable()->make($data)->renderAsHtml();
+```
+
+```php
+<?php
+
+nestable()->macro('helloWorld', function() {
+    return 'Hello Laravel';
+});
+
+// run
+nestable()->helloWorld();
+```

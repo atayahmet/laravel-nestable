@@ -19,12 +19,14 @@
         "illuminate/support": "5.2.*",
         "illuminate/database": "5.2.*"
     },
-
     "autoload": {
         "psr-4": {
             "Nestable\\": "src/",
             "Nestable\\Tests\\": "tests/"
         }
     },
+    "files": [
+      "src/helpers.php"
+    ],
     "minimum-stability": "dev"
 }
