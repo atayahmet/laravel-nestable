@@ -127,7 +127,7 @@ For html tree output:
 ```php
 <?php
 
-Category::renderAsHtml()->get();
+Category::renderAsHtml();
 ```
 
 Output:
@@ -156,10 +156,9 @@ For dropdown output:
 ```php
 <?php
 
-Category::renderAsDropdown()
-    ->attr(['name' => 'categories'])
+Category::attr(['name' => 'categories'])
     ->selected(2)
-    ->get();
+    ->renderAsDropdown();
 ```
 
 Output:
@@ -232,7 +231,7 @@ Get childs of the defined parent.
 ```php
 <?php
 
-Category::parent(2)->renderAsArray()->get();
+Category::parent(2)->renderAsArray();
 ```
 >**Note:** This methods usable all with output methods
 
@@ -244,21 +243,21 @@ Example 1:
 ```php
 <?php
 
-Menu::active('t-shirts')->renderAsHtml()->get();
+Menu::active('t-shirts')->renderAsHtml();
 ```
 
 Example 2:
 ```php
 <?php
 
-Menu::active('t-shirts', 'black-t-shirts')->renderAsHtml()->get();
+Menu::active('t-shirts', 'black-t-shirts')->renderAsHtml();
 ```
 
 Example 3:
 ```php
 <?php
 
-Menu::active(['t-shirts', 'black-t-shirts'])->renderAsHtml()->get();
+Menu::active(['t-shirts', 'black-t-shirts'])->renderAsHtml();
 ```
 
 Example 4:
@@ -269,7 +268,7 @@ Menu::active(function($li, $href, $label) {
 
     $li->addAttr('class', 'active')->addAttr('data-label', $label);
 
-})->renderAsHtml()->get();
+})->renderAsHtml();
 ```
 
 Example 5:
@@ -280,7 +279,7 @@ Menu::active(function($li, $href, $label) {
 
     $li->addAttr(['class' => 'active', 'data-label' => $label]);
 
-})->renderAsHtml()->get();
+})->renderAsHtml();
 ```
 
 route()
@@ -292,7 +291,7 @@ Example 1:
 ```php
 <?php
 
-Menu::route(['product' => 'slug'])->renderAsHtml()->get();
+Menu::route(['product' => 'slug'])->renderAsHtml();
 
 ```
 >**Note:** **product** refer to route name and **slug** refer to paremeter name.
@@ -311,7 +310,7 @@ Menu::route(function($href, $label) {
 
     return \URL::to($href);
 
-})->renderAsHtml()->get();
+})->renderAsHtml();
 ```
 
 selected()
@@ -322,21 +321,21 @@ Example 1:
 ```php
 <?php
 
-Category::selected(1)->renderAsDropdown()->get();
+Category::selected(1)->renderAsDropdown();
 ```
 
 Example 2:
 ```php
 <?php
 
-Category::selected(1,5)->renderAsMultiple()->get();
+Category::selected(1,5)->renderAsMultiple();
 ```
 
 Example 3:
 ```php
 <?php
 
-Category::selected([1,3])->renderAsMultiple()->get();
+Category::selected([1,3])->renderAsMultiple();
 ```
 
 Example 4:
@@ -348,7 +347,7 @@ Category::selected(function($option, $value, $label) {
     $option->addAttr('selected', 'true');
     $option->addAttr(['data-item' => $label]);
 
-})->renderAsMultiple()->get();
+})->renderAsMultiple();
 ```
 
 attr()
@@ -358,7 +357,7 @@ Dropdown/listbox attributes.
 ```php
 <?php
 
-Category::attr(['name' => 'categories', 'class' => 'red'])->renderAsDropdown()->get();
+Category::attr(['name' => 'categories', 'class' => 'red'])->renderAsDropdown();
 ```
 
 Configuration
