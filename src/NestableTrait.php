@@ -1,6 +1,7 @@
 <?php namespace Nestable;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Nestable\Services\NestableService;
 
 trait NestableTrait {
@@ -54,6 +55,12 @@ trait NestableTrait {
     protected static $to = 1;
 
     /**
+     * Query builder instance
+     * @var object Illuminate\Database\Eloquent\Builder;
+     */
+    protected static $_instance;
+
+    /**
      * Set the nest type
      *
      * @param  integer $to
@@ -74,7 +81,14 @@ trait NestableTrait {
      */
     public function get()
     {
-        $this->source = parent::get();
+        // if exists the where or similar things in the query
+        // call the from instance
+        if(static::$_instance instanceof Builder) {
+            $this->source = static::$_instance->get();
+        }else{
+            // if not call the parent directly
+            $this->source = parent::all();
+        }
 
         if(! static::$nested) {
             return $this->source;
@@ -107,7 +121,6 @@ trait NestableTrait {
 
         $nest = new NestableService;
         $nest->save(static::$parameters);
-
         $nestable = $nest->make($this->source);
 
         return call_user_func([$nestable, $method]);
@@ -121,7 +134,7 @@ trait NestableTrait {
      */
     public static function renderAsHtml()
     {
-        return self::nested(static::$toHtml);
+        return self::nested(static::$toHtml)->get();
     }
 
     /**
@@ -131,7 +144,7 @@ trait NestableTrait {
      */
     public static function renderAsArray()
     {
-        return self::nested(static::$toArray);
+        return self::nested(static::$toArray)->get();
     }
 
     /**
@@ -141,7 +154,7 @@ trait NestableTrait {
      */
     public static function renderAsJson()
     {
-        return self::nested(static::$toJson);
+        return self::nested(static::$toJson)->get();
     }
 
     /**
@@ -151,7 +164,7 @@ trait NestableTrait {
      */
     public static function renderAsMultiple()
     {
-        return self::multiple()->nested(static::$toDropdown);
+        return self::multiple()->nested(static::$toDropdown)->get();
     }
 
     /**
@@ -161,7 +174,7 @@ trait NestableTrait {
      */
     public static function renderAsDropdown()
     {
-        return self::nested(static::$toDropdown);
+        return self::nested(static::$toDropdown)->get();
     }
 
     /**
@@ -216,6 +229,25 @@ trait NestableTrait {
             return $this;
         }
 
-        return parent::__call($method, $args);
+        $result = parent::__call($method, $args);
+
+        if($result instanceof Builder) {
+            static::$_instance = $result;
+        }
+
+        return $this;
+    }
+
+    /**
+     * if called __callStatic method call to parent __callStatic
+     *
+     * @param  array $method
+     * @param  array $args
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        static::$_instance = forward_static_call_array([new self, $method], $args);
+        return new static;
     }
 }
