@@ -650,6 +650,7 @@ class NestableService {
             $type = 'body';
         }
 
+        $type = $type == 'multiple' ? 'dropdown' : $type;
         $fields = $this->config[$type];
         $valid  = true;
 
@@ -657,8 +658,7 @@ class NestableService {
         $this->data->map(function($item) use($fields, &$valid) {
 
             foreach($fields as $field) {
-
-                if($valid) {
+                if($valid && !empty($field)) {
                     $valid = isset($item[$field]);
                 }
             }
@@ -688,5 +688,4 @@ class NestableService {
             }
         }
     }
-
 }
