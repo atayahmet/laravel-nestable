@@ -161,6 +161,10 @@ abstract class TestCase extends OrchestraTestCase {
                 return '\<select\s+?\>(\<option\s+?value\=\".*?\"\>.*\<\/option\>)\<\/select\>';
                 break;
 
+            case "dropdown_single_option";
+                return "(\<option.*?\>.*?\<\/option\>){1}";
+                break;
+
         }
     }
 }

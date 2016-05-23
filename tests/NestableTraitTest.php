@@ -50,7 +50,7 @@ class NestableTraitTest extends DBTestCase {
 
     public function testRenderAsJson()
     {
-        $nested = Model\Category::renderAsJson()->get();
+        $nested = Model\Category::renderAsJson();
 
         json_decode($nested);
 
@@ -62,21 +62,28 @@ class NestableTraitTest extends DBTestCase {
 
     public function testRenderAsDropdown()
     {
-        $dropdown = Model\Category::renderAsDropdown()->get();
+        $dropdown = Model\Category::renderAsDropdown();
         $this->assertRegExp('/'.$this->_get_pattern('dropdown').'/', $dropdown);
+
+        // test where
+        $dropdown = Model\Category::whereRaw("name like '%i%' OR name like '%a%'")->renderAsDropdown();
+        $this->assertRegExp('/'.$this->_get_pattern('dropdown_single_option').'/', $dropdown);
+
     }
 
     public function testRenderAsMultiple()
     {
-        $dropdown = Model\Category::renderAsMultiple()->get();
+        $dropdown = Model\Category::renderAsMultiple();
         $this->assertRegExp('/'.$this->_get_pattern('multiple').'/', $dropdown);
+
+        // test where
+        $dropdown = Model\Category::whereRaw("name like '%i%' OR name like '%a%'")->renderAsMultiple();
+        $this->assertRegExp('/'.$this->_get_pattern('dropdown_single_option').'/', $dropdown);
     }
 
     public function testRenderAsHtml()
     {
-        $html = Model\Category::renderAsHtml()->get();
-
+        $html = Model\Category::renderAsHtml();
         $this->assertRegExp('/'.$this->_get_pattern('html').'/', $html);
-
     }
 }
