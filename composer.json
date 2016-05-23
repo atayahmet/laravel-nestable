@@ -13,11 +13,14 @@
             "role": "Developer"
         }
     ],
-
     "require": {
         "php": ">=5.5.5",
         "illuminate/support": "5.2.*",
         "illuminate/database": "5.2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.0|^5.0",
+        "orchestra/testbench": "~3.0"
     },
     "autoload": {
         "psr-4": {
