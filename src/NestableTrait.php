@@ -123,6 +123,7 @@ trait NestableTrait {
         $nest->save(static::$parameters);
         $nestable = $nest->make($this->source);
 
+        static::$nested = false;
         return call_user_func([$nestable, $method]);
 
     }
@@ -239,7 +240,7 @@ trait NestableTrait {
     }
 
     /**
-     * if called __callStatic method call to parent __callStatic
+     * Create new instance and call the method
      *
      * @param  array $method
      * @param  array $args
@@ -247,7 +248,6 @@ trait NestableTrait {
      */
     public static function __callStatic($method, $args)
     {
-        static::$_instance = forward_static_call_array([new self, $method], $args);
-        return new static;
+        return call_user_func_array([new static, $method], $args);
     }
 }
