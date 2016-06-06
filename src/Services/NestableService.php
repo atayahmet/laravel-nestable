@@ -1,4 +1,6 @@
-<?php namespace Nestable\Services;
+<?php
+
+namespace Nestable\Services;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as Collect;
@@ -8,85 +10,97 @@ use Closure;
 use URL;
 use Config;
 
-class NestableService {
-
+class NestableService
+{
     use MacrosTrait;
 
     /**
-     * configuration vars
+     * configuration vars.
+     *
      * @var array
      */
     protected $config;
 
     /**
-     * Parent key name
+     * Parent key name.
+     *
      * @var string
      */
     protected $parent;
 
     /**
-     * Parent idset of current process
+     * Parent idset of current process.
+     *
      * @var array
      */
     protected $parents;
 
     /**
-     * Dropdown attributes
+     * Dropdown attributes.
+     *
      * @var array
      */
     protected $dropdownAttr = [];
 
     /**
-     * Selectable values
+     * Selectable values.
+     *
      * @var mixed
      */
     protected $selected = false;
 
     /**
-     * Dropdown or Listbox item attributes
+     * Dropdown or Listbox item attributes.
+     *
      * @var array
      */
     protected $optionAttr = null;
 
+    protected $optionUlAttr = null;
+
     /**
-     * Selectable values for html output
+     * Selectable values for html output.
+     *
      * @var mixed
      */
     protected $active = false;
 
     /**
-     * Multiple dropdown status
-     * @var boolean
+     * Multiple dropdown status.
+     *
+     * @var bool
      */
     protected $multiple = false;
 
     /**
-     * Collection data
+     * Collection data.
+     *
      * @var object Illuminate\Support\Collection
      */
     public $data = [];
 
     /**
-     * Route parameters
+     * Route parameters.
+     *
      * @var array
      */
     protected $route = false;
 
     /**
-     * Set the data to wrap class
+     * Set the data to wrap class.
      *
-     * @param  mixed $data
+     * @param mixed $data
+     *
      * @return object
      */
     public function make($data)
     {
-        if($data instanceof Collection) {
+        if ($data instanceof Collection) {
             $this->data = collect($data->toArray());
-        }
-        elseif(is_array($data)) {
+        } elseif (is_array($data)) {
             $this->data = collect($data);
-        }else{
-            throw new InvalidArgumentException("Invalid data type.");
+        } else {
+            throw new InvalidArgumentException('Invalid data type.');
         }
 
         $this->config = Config::get('nestable');
@@ -99,53 +113,50 @@ class NestableService {
     }
 
     /**
-     * initialize parameters (toArray, toHtml, toDropdown)
+     * initialize parameters (toArray, toHtml, toDropdown).
      *
      * @param array $args
-     * @return void
      */
     protected function setParameters($args)
     {
-        if(count($args) < 1) {
-
+        if (count($args) < 1) {
             return [
                 'parent' => $this->parents ? current($this->parents) : 0,
-                'data'   => $this->data
+                'data' => $this->data,
             ];
-        }
-
-        elseif(count($args) == 1) {
+        } elseif (count($args) == 1) {
             return [
                 'parent' => reset($args),
-                'data'   => $this->data
+                'data' => $this->data,
             ];
-        }else{
+        } else {
             return [
-                'data'   => reset($args),
-                'parent' => next($args)
+                'data' => reset($args),
+                'parent' => next($args),
             ];
         }
     }
 
     /**
-     * Pass to array of all data as nesting
+     * Pass to array of all data as nesting.
      *
-     * @param  object  $data   Illuminate\Support\Collection
-     * @param  integer $parent
-     * @return Recursion|Array
+     * @param object $data   Illuminate\Support\Collection
+     * @param int    $parent
+     *
+     * @return Recursion|array
      */
     public function renderAsArray($data = false, $parent = 0)
     {
         $args = $this->setParameters(func_get_args());
         $tree = collect([]);
 
-        $args['data']->each(function($item) use(&$tree, $args) {
+        $args['data']->each(function ($item) use (&$tree,$args) {
 
             $currentData = collect([]);
 
-            if(intval($item[$this->parent]) == intval($args['parent'])) {
+            if (intval($item[$this->parent]) == intval($args['parent'])) {
                 // fill the array with the body fields
-                foreach($this->config['body'] as $field) {
+                foreach ($this->config['body'] as $field) {
                     $currentData->put($field, isset($item[$field]) ? $item[$field] : null);
                 }
 
@@ -158,14 +169,13 @@ class NestableService {
                 // Get the primary key name
                 $item_id = $item[$this->config['primary_key']];
                 // check the child element
-                if($this->hasChild($this->parent, $item_id, $args['data'])) {
+                if ($this->hasChild($this->parent, $item_id, $args['data'])) {
                     // function call again for child elements
                     $currentData->put($child, $this->renderAsArray($args['data'], $item_id));
                 }
 
                 // current data push to global array
                 $tree->push($currentData->toArray());
-
             }
 
         });
@@ -174,19 +184,20 @@ class NestableService {
     }
 
     /**
-     * Pass to json string of all data as nesting
+     * Pass to json string of all data as nesting.
      *
-     * @param  object  $data   Illuminate\Support\Collection
-     * @param  integer $parent
-     * @return Recursion|Array
+     * @param object $data   Illuminate\Support\Collection
+     * @param int    $parent
+     *
+     * @return Recursion|array
      */
     public function renderAsJson($data = false, $parent = 0)
     {
         $args = func_get_args();
 
-        if(count($args) < 1) {
+        if (count($args) < 1) {
             $data = $this->renderAsArray();
-        }else {
+        } else {
             $data = $this->renderAsArray($data);
         }
 
@@ -194,11 +205,12 @@ class NestableService {
     }
 
     /**
-     * Pass to html (ul:li) as nesting
+     * Pass to html (ul:li) as nesting.
      *
-     * @param  object  $data   Illuminate\Support\Collection
-     * @param  integer $parent Current parent id
-     * @param  bool  $first First run
+     * @param object $data   Illuminate\Support\Collection
+     * @param int    $parent Current parent id
+     * @param bool   $first  First run
+     *
      * @return string
      */
     public function renderAsHtml($data = false, $parent = 0, $first = true)
@@ -208,18 +220,17 @@ class NestableService {
         // open the ul tag if function is first run
         $tree = $first ? $this->ul() : '';
 
-        $args['data']->each(function($child_item) use(&$tree, $args) {
+        $args['data']->each(function ($child_item) use (&$tree,$args) {
 
             $childItems = '';
 
-            if(intval($child_item[$this->parent]) == intval($args['parent'])) {
-
+            if (intval($child_item[$this->parent]) == intval($args['parent'])) {
                 $path = $child_item[$this->config['html']['href']];
                 $label = $child_item[$this->config['html']['label']];
 
                 $currentData = [
                     'label' => $label,
-                    'href' => $this->url($path, $label)
+                    'href' => $this->url($path, $label),
                 ];
 
                 // Check the active item
@@ -231,12 +242,12 @@ class NestableService {
                 $item_id = $child_item[$this->config['primary_key']];
 
                 // check the child element
-                if($this->hasChild($this->parent, $item_id, $args['data'])) {
+                if ($this->hasChild($this->parent, $item_id, $args['data'])) {
 
                     // function call again for child elements
                     $html = $this->renderAsHtml($args['data'], $item_id, false);
 
-                    if(!empty($html)) {
+                    if (!empty($html)) {
                         $childItems .= $this->ul($html);
                     }
                 }
@@ -244,7 +255,6 @@ class NestableService {
                 // close the li tag
                 $childItems = $this->closeLi($childItems);
                 //dd($childItems);
-
             }
 
             // current data contact to the parent variable
@@ -254,16 +264,18 @@ class NestableService {
 
         // close the ul tag
         $tree = $first ? $this->closeUl($tree) : $tree;
+
         return $tree;
     }
 
     /**
-     * Convert to dropdown
+     * Convert to dropdown.
      *
-     * @param  object  $data   Illuminate\Support\Collection
-     * @param  integer $parent Current parent id
-     * @param  bool  $first  first run
-     * @param  integer $level nest counter
+     * @param object $data   Illuminate\Support\Collection
+     * @param int    $parent Current parent id
+     * @param bool   $first  first run
+     * @param int    $level  nest counter
+     *
      * @return string
      */
     public function renderAsDropdown($data = false, $parent = 0, $first = true, $level = 0)
@@ -271,24 +283,24 @@ class NestableService {
         $args = $this->setParameters(func_get_args());
 
         // open the select tag
-        if($first) {
+        if ($first) {
             $tree = $first ? '<select '.$this->addAttributes().' ' : '';
         }
 
         // if pass array data to selected method procces will generate multiple dropdown menu.
-        if($first && (is_array($this->selected) || $this->multiple == true)) {
+        if ($first && (is_array($this->selected) || $this->multiple == true)) {
             $tree .= ' multiple';
         }
 
-        if($first) {
+        if ($first) {
             $tree .= $first ? '>' : '';
         }
 
-        $args['data']->each(function($child_item) use(&$tree, $args, $level) {
+        $args['data']->each(function ($child_item) use (&$tree, $args,$level) {
 
             $childItems = '';
 
-            if(intval($child_item[$this->parent]) == intval($args['parent'])) {
+            if (intval($child_item[$this->parent]) == intval($args['parent'])) {
 
                 // Get the value
                 $value = $child_item[$this->config['dropdown']['value']];
@@ -299,7 +311,7 @@ class NestableService {
                 $prefix = $this->config['dropdown']['prefix'];
 
                 // Generating nest level
-                $levels = str_repeat("&nbsp;&nbsp;", $level);
+                $levels = str_repeat('&nbsp;&nbsp;', $level);
 
                 // check the does want select value
                 $selected = $this->doSelect($value, $label);
@@ -310,8 +322,8 @@ class NestableService {
                 $item_id = $child_item[$this->config['primary_key']];
 
                 // check the child element
-                if($this->hasChild($this->parent, $item_id, $args['data'])) {
-                    $level++; // nest level increasing
+                if ($this->hasChild($this->parent, $item_id, $args['data'])) {
+                    ++$level; // nest level increasing
 
                     // function call again for child elements
                     $childItems .= $this->renderAsDropdown($args['data'], $item_id, false, $level);
@@ -325,6 +337,7 @@ class NestableService {
 
         // close the select tag
         $tree = $first ? $tree.'</select>' : $tree;
+
         return $tree;
     }
 
@@ -334,9 +347,10 @@ class NestableService {
     }
 
     /**
-     * Set the attributes of generated dropdown
+     * Set the attributes of generated dropdown.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return object
      */
     public function attr(array $attributes)
@@ -347,7 +361,7 @@ class NestableService {
     }
 
     /**
-     * Contact th attributes to dropdown
+     * Contact th attributes to dropdown.
      *
      * @return string
      */
@@ -355,8 +369,7 @@ class NestableService {
     {
         $attrs = '';
 
-        foreach($this->dropdownAttr as $attr => $value) {
-
+        foreach ($this->dropdownAttr as $attr => $value) {
             $attrs .= $attr.'='.'"'.$value.'" ';
         }
 
@@ -364,26 +377,27 @@ class NestableService {
     }
 
     /**
-     * Child menu checker
+     * Child menu checker.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  object  $data  Illuminate\Support\Collection as Collect
-     * @return boolean
+     * @param string $key
+     * @param mixed  $value
+     * @param object $data  Illuminate\Support\Collection as Collect
+     *
+     * @return bool
      */
     public function hasChild($key = null, $value = null, Collect $data = null)
     {
-        if(count(func_num_args()) < 3) {
+        if (count(func_num_args()) < 3) {
             $data = $this->data;
-            $key  = $this->parent;
+            $key = $this->parent;
             $value = current(func_get_args());
         }
 
         $child = false;
 
-        $data->each(function($item) use(&$child, $key, $value){
+        $data->each(function ($item) use (&$child, $key,$value) {
 
-            if(intval($item[$key]) == intval($value) && ! $child) {
+            if (intval($item[$key]) == intval($value) && !$child) {
                 $child = true;
             }
 
@@ -393,16 +407,17 @@ class NestableService {
     }
 
     /**
-     * Save the will select values
+     * Save the will select values.
      *
-     * @param  int|array $values
+     * @param int|array $values
+     *
      * @return object
      */
     public function selected($values)
     {
         $this->selected = $values;
 
-        if(func_num_args() > 1) {
+        if (func_num_args() > 1) {
             $this->selected = func_get_args();
         }
 
@@ -414,7 +429,7 @@ class NestableService {
         $args = func_get_args();
         $this->active = current($args);
 
-        if(func_num_args() > 1) {
+        if (func_num_args() > 1) {
             $this->active = $args;
         }
 
@@ -423,25 +438,30 @@ class NestableService {
 
     protected function doActive($href, $label)
     {
-        if($this->active) {
+        if ($this->active) {
 
             // Find active path in array
-            if(is_array($this->active) && count($this->active) > 0) {
+            if (is_array($this->active) && count($this->active) > 0) {
                 $result = array_search($href, $this->active);
 
-                if($result !== false) {
+                if ($result !== false) {
                     unset($this->active[$result]);
+
                     return 'class="active"';
                 }
             }
 
             // Run the closure for user customizable
-            elseif($this->active instanceof Closure) {
+            elseif ($this->active instanceof Closure) {
                 call_user_func_array($this->active, [$this, $href, $label]);
-                return $this->renderAttr($this->optionAttr);
-            }else{
-                if($this->active == $href) {
+                $attrs = $this->renderAttr($this->optionAttr);
+                $this->optionAttr = null;
+
+                return $attrs;
+            } else {
+                if ($this->active == $href) {
                     $this->active = null;
+
                     return 'class="active"';
                 }
             }
@@ -449,7 +469,7 @@ class NestableService {
     }
 
     /**
-     * Multiple dropdown menu
+     * Multiple dropdown menu.
      *
      * @return object
      */
@@ -462,11 +482,10 @@ class NestableService {
 
     public function parent($parent = false)
     {
-        if($parent) {
-
+        if ($parent) {
             $this->parents = !is_array($parent) ? [$parent] : $parent;
 
-            if(func_num_args() > 1) {
+            if (func_num_args() > 1) {
                 $this->parents = func_get_args();
             }
         }
@@ -475,32 +494,31 @@ class NestableService {
     }
 
     /**
-     * Set the as selected of items
+     * Set the as selected of items.
      *
-     * @param  mixed $value
+     * @param mixed $value
+     *
      * @return string
      */
     protected function doSelect($value, $label)
     {
-        if($this->selected) {
-
-            if(is_array($this->selected) && count($this->selected) > 0) {
-
+        if ($this->selected) {
+            if (is_array($this->selected) && count($this->selected) > 0) {
                 $result = array_search($value, $this->selected);
 
-                if($result !== false) {
+                if ($result !== false) {
                     unset($this->selected[$result]);
+
                     return 'selected';
                 }
-            }
-
-            elseif($this->selected instanceof Closure) {
+            } elseif ($this->selected instanceof Closure) {
                 call_user_func_array($this->selected, [$this, $value, $label]);
-                return $this->renderAttr($this->optionAttr);
-            }else{
-
-                if($this->selected == $value) {
+                $attrs = $this->renderAttr($this->optionAttr);
+                $this->optionAttr = null;
+            } else {
+                if ($this->selected == $value) {
                     $this->selected = null;
+
                     return 'selected="selected"';
                 }
             }
@@ -509,65 +527,70 @@ class NestableService {
 
     public function addAttr($attr, $value = '')
     {
-        if(func_num_args() > 1) {
+        if (func_num_args() > 1) {
             $this->optionAttr[$attr] = $value;
-        }
-
-        elseif(is_array($attr)) {
+        } elseif (is_array($attr)) {
             $this->optionAttr = $attr;
         }
 
         return $this;
     }
 
-    protected function renderAttr()
+    public function ulAttr($attr, $value = '')
     {
-        $attributes = '';
+        if (func_num_args() > 1) {
+            $this->optionUlAttr[$attr] = $value;
+        } elseif (is_array($attr)) {
+            $this->optionUlAttr = $attr;
+        }
 
-        if(is_array($this->optionAttr)) {
-            foreach($this->optionAttr as $attr => $value) {
-                $attributes .= ' '.$attr.'="'.$value.'"';
+        return $this;
+    }
+
+    protected function renderAttr($attributes = false)
+    {
+        $attrStr = '';
+
+        if (is_array($attributes)) {
+            foreach ($attributes as $attr => $value) {
+                $attrStr .= ' '.$attr.'="'.$value.'"';
             }
         }
 
-        $this->optionAttr = null;
-
-        return $attributes;
+        return $attrStr;
     }
 
     /**
-     * Save the parameters
+     * Save the parameters.
      *
-     * @param  array $params
-     * @return void
+     * @param array $params
      */
     public function save(array $params)
     {
-        foreach($params as $method => $param) {
+        foreach ($params as $method => $param) {
             $this->{$method}($param);
         }
     }
 
     /**
-     * URL Generator
+     * URL Generator.
      *
-     * @param  string $path
+     * @param string $path
+     *
      * @return string
      */
     protected function url($path, $label)
     {
-        if($this->config['generate_url']) {
-
-            if($this->route) {
-
-                if($this->route instanceof Closure){
+        if ($this->config['generate_url']) {
+            if ($this->route) {
+                if ($this->route instanceof Closure) {
                     return call_user_func_array($this->route, [$path, $label]);
-                }else{
+                } else {
                     $param = current($this->route);
                     $name = key($this->route);
+
                     return URL::route($name, [$param => $path]);
                 }
-
             }
 
             return URL::to($path);
@@ -577,10 +600,9 @@ class NestableService {
     }
 
     /**
-     * Route generator
+     * Route generator.
      *
-     * @param  array $route
-     * @return void
+     * @param array $route
      */
     public function route($route)
     {
@@ -590,22 +612,33 @@ class NestableService {
     }
 
     /**
-     * Generate open ul tag
+     * Generate open ul tag.
      *
-     * @param  string $items
+     * @param string $items
+     *
      * @return string
      */
     public function ul($items = false)
     {
-        if(! $items) return "\n".'<ul>'."\n";
+        $attrs = '';
 
-        return '<ul>'."\n".$items."\n".'</ul>';
+        if (is_array($this->optionUlAttr) && count($this->optionUlAttr) > 0) {
+            $attrs = $this->renderAttr($this->optionUlAttr);
+            $this->optionUlAttr = null;
+        }
+
+        if (!$items) {
+            return "\n".'<ul'.$attrs.'>'."\n";
+        }
+
+        return '<ul'.$attrs.'>'."\n".$items."\n".'</ul>';
     }
 
     /**
-     * Generate close ul tag
+     * Generate close ul tag.
      *
-     * @param  string $ul
+     * @param string $ul
+     *
      * @return string
      */
     public function closeUl($ul)
@@ -614,20 +647,22 @@ class NestableService {
     }
 
     /**
-     * Generate open li tag
+     * Generate open li tag.
      *
-     * @param  array  $li
+     * @param array $li
+     *
      * @return string
      */
     public function openLi(array $li, $extra = '')
     {
-        return "\n".'<li '.$extra.'><a href="' . $li['href'] . '">' . $li['label'] . '</a>';
+        return "\n".'<li '.$extra.'><a href="'.$li['href'].'">'.$li['label'].'</a>';
     }
 
     /**
-     * Generate close li tag
+     * Generate close li tag.
      *
-     * @param  string $li
+     * @param string $li
+     *
      * @return string
      */
     public function closeLi($li)
@@ -636,29 +671,30 @@ class NestableService {
     }
 
     /**
-     * Array validator
+     * Array validator.
      *
-     * @param  string  $type
-     * @param  boolean  $return
+     * @param string $type
+     * @param bool   $return
+     *
      * @return mixed
      */
     public function isValid($type, $render = false)
     {
         $original = $type;
 
-        if(in_array($type, ['json', 'array'])) {
+        if (in_array($type, ['json', 'array'])) {
             $type = 'body';
         }
 
         $type = $type == 'multiple' ? 'dropdown' : $type;
         $fields = $this->config[$type];
-        $valid  = true;
+        $valid = true;
 
         // mapping all data
-        $this->data->map(function($item) use($fields, &$valid) {
+        $this->data->map(function ($item) use ($fields, &$valid,$type) {
 
-            foreach($fields as $field) {
-                if($valid && !empty($field)) {
+            foreach ($fields as $field) {
+                if ($valid && !empty($field)) {
                     $valid = isset($item[$field]);
                 }
             }
@@ -666,7 +702,7 @@ class NestableService {
         });
 
         // render data
-        if($valid && $render) {
+        if ($valid && $render) {
             return call_user_func([$this, 'renderAs'.ucfirst($original)]);
         }
 
@@ -675,15 +711,12 @@ class NestableService {
 
     public function __call($method, $args)
     {
-        if($this->hasMacro($method)) {
+        if ($this->hasMacro($method)) {
             return $this->runMacro($method, $args);
-        }
-
-        elseif(preg_match('/^isValid/', $method)) {
-
+        } elseif (preg_match('/^isValid/', $method)) {
             preg_match('/For(.*?)$/', $method, $matches);
 
-            if(count($matches) > 1) {
+            if (count($matches) > 1) {
                 return $this->isValid(strtolower($matches[1]), current($args));
             }
         }
