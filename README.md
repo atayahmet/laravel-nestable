@@ -213,7 +213,8 @@ renderAsHtml()
 name                  | paremeter         | description                      
 ----------------------| ----------------- | --------------------------------
 [parent()](#parent)   | int               | Get childs of the defined parent
-[active()](#active)   | callback/array/int| Selected item(s) for html output               
+[active()](#active)   | callback/array/int| Selected item(s) for html output
+[ulAttr()](#ulAttr)   | array/string      | Add attribute to parent ul element
 [route()](#route)     | callback/array    | Generate url by route name
 
 renderAsDropdown()/renderAsMultiple()
@@ -282,6 +283,24 @@ Menu::active(function($li, $href, $label) {
     $li->addAttr(['class' => 'active', 'data-label' => $label]);
 
 })->renderAsHtml();
+```
+
+ulAttr()
+---
+Add attribute to parent ul element
+
+Example 1:
+```php
+<?php
+
+Menu::ulAttr('class', 'nav-bar')->renderAsHtml();
+```
+
+Example 2:
+```php
+<?php
+
+Menu::ulAttr(['t-shirts' => 'black-t-shirts'])->renderAsHtml();
 ```
 
 route()
