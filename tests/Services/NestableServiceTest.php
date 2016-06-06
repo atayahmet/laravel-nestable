@@ -122,6 +122,14 @@ class NestableServiceTest extends TestCase {
 
     }
 
+    public function testUlAttr()
+    {
+        $nestable = new \Nestable\Services\NestableService;
+        $nested = $nestable->make($this->categories);
+        $html = $nested->ulAttr(['class' => 'nav-bar'])->renderAsHtml();
+        $this->assertRegExp('/'.$this->_get_pattern('attribute_pattern_for_ul').'/', $html);
+    }
+
     public function testRoute()
     {
         $nestable = new \Nestable\Services\NestableService;

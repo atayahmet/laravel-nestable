@@ -165,6 +165,9 @@ abstract class TestCase extends OrchestraTestCase {
                 return "(\<option.*?\>.*?\<\/option\>){1}";
                 break;
 
+            case "attribute_pattern_for_ul";
+                return "(\<ul\s+[a-zA-Z]+\=\".*?\">)";
+                break;
         }
     }
 }
