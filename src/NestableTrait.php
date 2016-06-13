@@ -3,6 +3,7 @@
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Nestable\Services\NestableService;
+use Closure;
 
 trait NestableTrait {
 
@@ -197,7 +198,20 @@ trait NestableTrait {
      */
     protected function saveParameter($method, $value)
     {
-        static::$parameters[$method] = $value;
+        if (! isset(static::$parameters[$method])) {
+            static::$parameters[$method] = [];
+        }
+
+        if($value instanceof Closure) {
+            static::$parameters[$method]['callback'] = $value;
+        }
+        elseif(isset($value[0])) {
+            list($key, $val) = $value;
+            static::$parameters[$method][$key] = $val;
+        }
+        elseif(is_array($value)) {
+            static::$parameters[$method][key($value)] = current($value);
+        }
 
         return $this;
     }

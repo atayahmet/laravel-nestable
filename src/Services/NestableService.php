@@ -218,7 +218,7 @@ class NestableService
         $args = $this->setParameters(func_get_args());
 
         // open the ul tag if function is first run
-        $tree = $first ? $this->ul() : '';
+        $tree = $first ? $this->ul(null, $parent) : '';
 
         $args['data']->each(function ($child_item) use (&$tree,$args) {
 
@@ -248,13 +248,12 @@ class NestableService
                     $html = $this->renderAsHtml($args['data'], $item_id, false);
 
                     if (!empty($html)) {
-                        $childItems .= $this->ul($html);
+                        $childItems .= $this->ul($html, $item_id);
                     }
                 }
 
                 // close the li tag
                 $childItems = $this->closeLi($childItems);
-                //dd($childItems);
             }
 
             // current data contact to the parent variable
@@ -525,6 +524,13 @@ class NestableService
         }
     }
 
+    /**
+     * Add attribute to <li> element
+     *
+     * @param mixed $attr
+     * @param mixed $value
+     * @return object
+     */
     public function addAttr($attr, $value = '')
     {
         if (func_num_args() > 1) {
@@ -536,6 +542,13 @@ class NestableService
         return $this;
     }
 
+    /**
+     * Add attribute to <ul> element
+     *
+     * @param  mixed $attr
+     * @param  mixed $value
+     * @return object
+     */
     public function ulAttr($attr, $value = '')
     {
         if (func_num_args() > 1) {
@@ -547,13 +560,32 @@ class NestableService
         return $this;
     }
 
-    protected function renderAttr($attributes = false)
+    /**
+     * Render the attritues of html elements
+     *
+     * @param  mixed $attributes
+     * @param  mixed $params
+     * @return string
+     */
+    protected function renderAttr($attributes = false, $params = false)
     {
         $attrStr = '';
 
+        if(isset($attributes['callback'])) {
+            $callbackParams = [$this];
+
+            if($params !== false) {
+                array_push($callbackParams, $params);
+            }
+
+            call_user_func_array($attributes['callback'], $callbackParams);
+        }
+
         if (is_array($attributes)) {
             foreach ($attributes as $attr => $value) {
-                $attrStr .= ' '.$attr.'="'.$value.'"';
+                if(is_string($value)) {
+                    $attrStr .= ' '.$attr.'="'.$value.'"';
+                }
             }
         }
 
@@ -568,7 +600,11 @@ class NestableService
     public function save(array $params)
     {
         foreach ($params as $method => $param) {
-            $this->{$method}($param);
+            if(is_array($param) && isset($param[0])) {
+                call_user_func_array([$this, $method], $param);
+            }else{
+                $this->{$method}($param);
+            }
         }
     }
 
@@ -618,13 +654,12 @@ class NestableService
      *
      * @return string
      */
-    public function ul($items = false)
+    public function ul($items = false, $parent_id = 0)
     {
         $attrs = '';
 
         if (is_array($this->optionUlAttr) && count($this->optionUlAttr) > 0) {
-            $attrs = $this->renderAttr($this->optionUlAttr);
-            $this->optionUlAttr = null;
+            $attrs = $this->renderAttr($this->optionUlAttr, $parent_id);
         }
 
         if (!$items) {
