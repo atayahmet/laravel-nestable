@@ -303,6 +303,19 @@ Example 2:
 Menu::ulAttr(['t-shirts' => 'black-t-shirts'])->renderAsHtml();
 ```
 
+Example 3:
+```php
+<?php
+
+Menu::ulAttr(function($ul, $parent_id) {
+
+    if($parent_id == 10) {
+        $ul->ulAttr('class', 'nav-bar');
+    }
+
+})->renderAsHtml();
+```
+
 route()
 ---
 
