@@ -1,16 +1,17 @@
-<?php namespace Nestable\Tests;
+<?php
 
-use Nestable;
+namespace Nestable\Tests;
+
 use RecursiveIteratorIterator;
 use RecursiveArrayIterator;
 
-class NestableTraitTest extends DBTestCase {
-
+class NestableTraitTest extends DBTestCase
+{
     protected $categories;
 
     /**
-    * Setup the test environment.
-    */
+     * Setup the test environment.
+     */
     public function setUp()
     {
         parent::setUp();
@@ -34,12 +35,10 @@ class NestableTraitTest extends DBTestCase {
 
         $parent_id = $this->_get_random_parent_id($iteratorArray);
 
-        if($parent_id) {
-
+        if ($parent_id) {
             $result = $this->_helper_recursive($nested, $parent_id);
 
             $this->assertGreaterThan(0, $result);
-
         }
     }
 
@@ -57,7 +56,6 @@ class NestableTraitTest extends DBTestCase {
         $this->assertLessThan(1, json_last_error());
 
         $this->assertTrue($nested != json_encode($this->categories));
-
     }
 
     public function testRenderAsDropdown()
@@ -68,7 +66,6 @@ class NestableTraitTest extends DBTestCase {
         // test where
         $dropdown = Model\Category::whereRaw("name like '%i%' OR name like '%a%'")->renderAsDropdown();
         $this->assertRegExp('/'.$this->_get_pattern('dropdown_single_option').'/', $dropdown);
-
     }
 
     public function testRenderAsMultiple()

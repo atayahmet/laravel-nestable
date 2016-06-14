@@ -91,7 +91,7 @@ class NestableService
      *
      * @param mixed $data
      *
-     * @return object
+     * @return object (instance)
      */
     public function make($data)
     {
@@ -150,7 +150,7 @@ class NestableService
         $args = $this->setParameters(func_get_args());
         $tree = collect([]);
 
-        $args['data']->each(function ($item) use (&$tree,$args) {
+        $args['data']->each(function ($item) use (&$tree, $args) {
 
             $currentData = collect([]);
 
@@ -220,7 +220,7 @@ class NestableService
         // open the ul tag if function is first run
         $tree = $first ? $this->ul(null, $parent) : '';
 
-        $args['data']->each(function ($child_item) use (&$tree,$args) {
+        $args['data']->each(function ($child_item) use (&$tree, $args) {
 
             $childItems = '';
 
@@ -295,7 +295,7 @@ class NestableService
             $tree .= $first ? '>' : '';
         }
 
-        $args['data']->each(function ($child_item) use (&$tree, $args,$level) {
+        $args['data']->each(function ($child_item) use (&$tree, $args, $level) {
 
             $childItems = '';
 
@@ -350,7 +350,7 @@ class NestableService
      *
      * @param array $attributes
      *
-     * @return object
+     * @return object (instance)
      */
     public function attr(array $attributes)
     {
@@ -394,7 +394,7 @@ class NestableService
 
         $child = false;
 
-        $data->each(function ($item) use (&$child, $key,$value) {
+        $data->each(function ($item) use (&$child, $key, $value) {
 
             if (intval($item[$key]) == intval($value) && !$child) {
                 $child = true;
@@ -410,7 +410,7 @@ class NestableService
      *
      * @param int|array $values
      *
-     * @return object
+     * @return object (instance)
      */
     public function selected($values)
     {
@@ -423,6 +423,11 @@ class NestableService
         return $this;
     }
 
+    /**
+     * Attribute insert helper for html render.
+     *
+     * @return object (instance)
+     */
     public function active()
     {
         $args = func_get_args();
@@ -435,10 +440,21 @@ class NestableService
         return $this;
     }
 
+    /**
+     * Insert all saved attributes to <li> element.
+     *
+     * @param array  $href
+     * @param string $label
+     *
+     * @return string
+     */
     protected function doActive($href, $label)
     {
-        if ($this->active) {
+        if (is_array($this->active) && array_key_exists('callback', $this->active)) {
+            $this->active = $this->active['callback'];
+        }
 
+        if ($this->active) {
             // Find active path in array
             if (is_array($this->active) && count($this->active) > 0) {
                 $result = array_search($href, $this->active);
@@ -470,7 +486,7 @@ class NestableService
     /**
      * Multiple dropdown menu.
      *
-     * @return object
+     * @return object (instance)
      */
     public function multiple()
     {
@@ -479,6 +495,13 @@ class NestableService
         return $this;
     }
 
+    /**
+     * Set the parent id for child elements.
+     *
+     * @param int $parent
+     *
+     * @return object (instance)
+     */
     public function parent($parent = false)
     {
         if ($parent) {
@@ -525,11 +548,12 @@ class NestableService
     }
 
     /**
-     * Add attribute to <li> element
+     * Add attribute to <li> element.
      *
      * @param mixed $attr
      * @param mixed $value
-     * @return object
+     *
+     * @return object (instance)
      */
     public function addAttr($attr, $value = '')
     {
@@ -543,11 +567,12 @@ class NestableService
     }
 
     /**
-     * Add attribute to <ul> element
+     * Add attribute to <ul> element.
      *
-     * @param  mixed $attr
-     * @param  mixed $value
-     * @return object
+     * @param mixed $attr
+     * @param mixed $value
+     *
+     * @return object (instance)
      */
     public function ulAttr($attr, $value = '')
     {
@@ -561,20 +586,21 @@ class NestableService
     }
 
     /**
-     * Render the attritues of html elements
+     * Render the attritues of html elements.
      *
-     * @param  mixed $attributes
-     * @param  mixed $params
+     * @param mixed $attributes
+     * @param mixed $params
+     *
      * @return string
      */
     protected function renderAttr($attributes = false, $params = false)
     {
         $attrStr = '';
 
-        if(isset($attributes['callback'])) {
+        if (isset($attributes['callback'])) {
             $callbackParams = [$this];
 
-            if($params !== false) {
+            if ($params !== false) {
                 array_push($callbackParams, $params);
             }
 
@@ -583,7 +609,7 @@ class NestableService
 
         if (is_array($attributes)) {
             foreach ($attributes as $attr => $value) {
-                if(is_string($value)) {
+                if (is_string($value)) {
                     $attrStr .= ' '.$attr.'="'.$value.'"';
                 }
             }
@@ -600,9 +626,9 @@ class NestableService
     public function save(array $params)
     {
         foreach ($params as $method => $param) {
-            if(is_array($param) && isset($param[0])) {
+            if (is_array($param) && isset($param[0])) {
                 call_user_func_array([$this, $method], $param);
-            }else{
+            } else {
                 $this->{$method}($param);
             }
         }
@@ -726,7 +752,7 @@ class NestableService
         $valid = true;
 
         // mapping all data
-        $this->data->map(function ($item) use ($fields, &$valid,$type) {
+        $this->data->map(function ($item) use ($fields, &$valid, $type) {
 
             foreach ($fields as $field) {
                 if ($valid && !empty($field)) {

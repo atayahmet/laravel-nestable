@@ -1,70 +1,82 @@
-<?php namespace Nestable;
+<?php
+
+namespace Nestable;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Nestable\Services\NestableService;
 use Closure;
 
-trait NestableTrait {
-
+trait NestableTrait
+{
     /**
-     * Start the nested process
+     * Start the nested process.
+     *
      * @var mixed
      */
     protected static $nested = false;
 
     /**
-     * Soruce data
+     * Soruce data.
+     *
      * @var object Illuminate\Database\Eloquent\Collection
      */
     protected $source;
 
     /**
-     * Service parameters
+     * Service parameters.
+     *
      * @var array
      */
     protected static $parameters = [];
 
     /**
-     * Array service
-     * @var integer
+     * Array service.
+     *
+     * @var int
      */
     public static $toArray = 1;
 
     /**
-     * Json string service
-     * @var integer
+     * Json string service.
+     *
+     * @var int
      */
     public static $toJson = 2;
 
     /**
-     * Html service
-     * @var integer
+     * Html service.
+     *
+     * @var int
      */
     public static $toHtml = 3;
 
     /**
-     * Dropdown service
-     * @var integer
+     * Dropdown service.
+     *
+     * @var int
      */
     public static $toDropdown = 4;
 
     /**
-     * Default service number (toArray)
-     * @var integer
+     * Default service number (toArray).
+     *
+     * @var int
      */
     protected static $to = 1;
 
     /**
-     * Query builder instance
+     * Query builder instance.
+     *
      * @var object Illuminate\Database\Eloquent\Builder;
      */
     protected static $_instance;
 
     /**
-     * Set the nest type
+     * Set the nest type.
      *
-     * @param  integer $to
+     * @param int $to
+     *
      * @return object
      */
     public static function nested($to = 1)
@@ -72,11 +84,11 @@ trait NestableTrait {
         static::$to = $to;
         static::$nested = is_numeric($to) ? $to : false;
 
-        return new self;
+        return new self();
     }
 
     /**
-     * Get the data from db to collection or default return
+     * Get the data from db to collection or default return.
      *
      * @return mixed
      */
@@ -84,14 +96,14 @@ trait NestableTrait {
     {
         // if exists the where or similar things in the query
         // call the from instance
-        if(static::$_instance instanceof Builder) {
+        if (static::$_instance instanceof Builder) {
             $this->source = static::$_instance->get();
-        }else{
+        } else {
             // if not call the parent directly
             $this->source = parent::all();
         }
 
-        if(! static::$nested) {
+        if (!static::$nested) {
             return $this->source;
         }
 
@@ -99,38 +111,35 @@ trait NestableTrait {
     }
 
     /**
-     * Pass data to nest methods
+     * Pass data to nest methods.
      *
      * @return mixed
      */
     protected function to()
     {
-        if(static::$to === 1) {
+        if (static::$to === 1) {
             $method = 'renderAsArray';
-        }
-        elseif(static::$to === 2) {
+        } elseif (static::$to === 2) {
             $method = 'renderAsJson';
-        }
-        elseif(static::$to === 3) {
+        } elseif (static::$to === 3) {
             $method = 'renderAsHtml';
-        }
-        elseif(static::$to === 4) {
+        } elseif (static::$to === 4) {
             $method = 'renderAsDropdown';
-        }else{
+        } else {
             return $this->source;
         }
 
-        $nest = new NestableService;
+        $nest = new NestableService();
         $nest->save(static::$parameters);
         $nestable = $nest->make($this->source);
 
         static::$nested = false;
-        return call_user_func([$nestable, $method]);
 
+        return call_user_func([$nestable, $method]);
     }
 
     /**
-     * Render as html
+     * Render as html.
      *
      * @return string
      */
@@ -140,7 +149,7 @@ trait NestableTrait {
     }
 
     /**
-     * Render as array tree
+     * Render as array tree.
      *
      * @return array
      */
@@ -150,7 +159,7 @@ trait NestableTrait {
     }
 
     /**
-     * Render as json string
+     * Render as json string.
      *
      * @return array
      */
@@ -160,7 +169,7 @@ trait NestableTrait {
     }
 
     /**
-     * Render as multiple list box
+     * Render as multiple list box.
      *
      * @return string
      */
@@ -170,7 +179,7 @@ trait NestableTrait {
     }
 
     /**
-     * Render as dropdown
+     * Render as dropdown.
      *
      * @return string
      */
@@ -180,7 +189,7 @@ trait NestableTrait {
     }
 
     /**
-     * Return the parent key name
+     * Return the parent key name.
      *
      * @return string
      */
@@ -190,26 +199,25 @@ trait NestableTrait {
     }
 
     /**
-     * Save the service parameters
+     * Save the service parameters.
      *
-     * @param  string $method Method name in NestableService
-     * @param  mixed $value
+     * @param string $method Method name in NestableService
+     * @param mixed  $value
+     *
      * @return object
      */
     protected function saveParameter($method, $value)
     {
-        if (! isset(static::$parameters[$method])) {
+        if (!isset(static::$parameters[$method])) {
             static::$parameters[$method] = [];
         }
 
-        if($value instanceof Closure) {
+        if ($value instanceof Closure) {
             static::$parameters[$method]['callback'] = $value;
-        }
-        elseif(isset($value[0])) {
+        } elseif (isset($value[0])) {
             list($key, $val) = $value;
             static::$parameters[$method][$key] = $val;
-        }
-        elseif(is_array($value)) {
+        } elseif (is_array($value)) {
             static::$parameters[$method][key($value)] = current($value);
         }
 
@@ -217,7 +225,7 @@ trait NestableTrait {
     }
 
     /**
-     * Get the all service parameters
+     * Get the all service parameters.
      *
      * @return array
      */
@@ -228,16 +236,16 @@ trait NestableTrait {
 
     /**
      * if called method not exists in NestableService
-     * pass to parent __call method
+     * pass to parent __call method.
      *
-     * @param  array $method
-     * @param  array $args
+     * @param array $method
+     * @param array $args
+     *
      * @return mixed
      */
     public function __call($method, $args)
     {
-        if(method_exists(NestableService::class, $method)) {
-
+        if (method_exists(NestableService::class, $method)) {
             $args = count($args) > 1 ? $args : current($args);
             static::saveParameter($method, $args);
 
@@ -246,7 +254,7 @@ trait NestableTrait {
 
         $result = parent::__call($method, $args);
 
-        if($result instanceof Builder) {
+        if ($result instanceof Builder) {
             static::$_instance = $result;
         }
 
@@ -254,14 +262,15 @@ trait NestableTrait {
     }
 
     /**
-     * Create new instance and call the method
+     * Create new instance and call the method.
      *
-     * @param  array $method
-     * @param  array $args
+     * @param array $method
+     * @param array $args
+     *
      * @return mixed
      */
     public static function __callStatic($method, $args)
     {
-        return call_user_func_array([new static, $method], $args);
+        return call_user_func_array([new static(), $method], $args);
     }
 }

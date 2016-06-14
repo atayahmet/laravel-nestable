@@ -1,8 +1,9 @@
-<?php namespace Nestable\Tests;
+<?php
 
-use Orchestra\Testbench\TestCase as OrchestraTestCase;
+namespace Nestable\Tests;
 
-class DBTestCase extends TestCase {
+class DBTestCase extends TestCase
+{
     /*
      * Bootstrap the application
      */
@@ -17,26 +18,23 @@ class DBTestCase extends TestCase {
                 '--realpath' => realpath(__DIR__.'/migrations'),
             ]
         );
-
     }
 
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
 
         $app['config']->set('nestable',  require(__DIR__.'/../config/nestable.php'));
-
     }
 }

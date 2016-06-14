@@ -1,11 +1,13 @@
-<?php namespace Nestable\Tests\Services;
+<?php
+
+namespace Nestable\Tests\Services;
 
 use RecursiveIteratorIterator;
 use RecursiveArrayIterator;
 use Nestable\Tests\TestCase;
 
-class NestableServiceTest extends TestCase {
-
+class NestableServiceTest extends TestCase
+{
     protected $categories;
 
     public function setUp()
@@ -17,7 +19,7 @@ class NestableServiceTest extends TestCase {
 
     public function testMake()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $this->assertContainsOnlyInstancesOf(\Nestable\Services\NestableService::class, array($nested));
@@ -25,7 +27,7 @@ class NestableServiceTest extends TestCase {
 
     public function testRenderAsArray()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories)->renderAsArray();
 
         $iteratorArray = new RecursiveArrayIterator($nested);
@@ -36,18 +38,16 @@ class NestableServiceTest extends TestCase {
 
         $parent_id = $this->_get_random_parent_id($iteratorArray);
 
-        if($parent_id) {
-
+        if ($parent_id) {
             $result = $this->_helper_recursive($nested, $parent_id);
 
             $this->assertGreaterThan(0, $result);
-
         }
     }
 
     public function testRenderAsJson()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories)->renderAsJson();
 
         json_decode($nested);
@@ -55,12 +55,11 @@ class NestableServiceTest extends TestCase {
         $this->assertLessThan(1, json_last_error());
 
         $this->assertTrue($nested != json_encode($this->categories));
-
     }
 
     public function testRenderAsDropdown()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories)->renderAsDropdown();
 
         $this->assertRegExp('/'.$this->_get_pattern('dropdown').'/', $nested);
@@ -68,7 +67,7 @@ class NestableServiceTest extends TestCase {
 
     public function testRenderAsMultiple()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories)->renderAsMultiple();
 
         $this->assertRegExp('/'.$this->_get_pattern('multiple').'/', $nested);
@@ -76,36 +75,35 @@ class NestableServiceTest extends TestCase {
 
     public function testRenderAsHtml()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories)->renderAsHtml();
 
         $this->assertRegExp('/'.$this->_get_pattern('html ').'/', $nested);
-
     }
 
     public function testAttr()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $dropdown = $nested->attr(['name' => 'category', 'id' => 'category'])->renderAsDropdown();
 
-        $this->assertRegExp('/\<select\s+?name\=\"category\"\s+id=\"category\"\s+\>/',$dropdown);
+        $this->assertRegExp('/\<select\s+?name\=\"category\"\s+id=\"category\"\s+\>/', $dropdown);
     }
 
     public function testSelected()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $dropdown = $nested->selected(2)->renderAsDropdown();
 
-        $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"2\"\>/',$dropdown);
+        $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"2\"\>/', $dropdown);
     }
 
     public function testParent()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories)->parent(1)->renderAsArray();
 
         $this->assertEquals(collect($nested)->where('parent_id', 1)->count(), 3);
@@ -113,18 +111,27 @@ class NestableServiceTest extends TestCase {
 
     public function testActive()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $html = $nested->active('sweaters')->renderAsHtml();
-
         $this->assertRegExp('/\<li\s+?class=\"active\"\><a\s+?href=\".*\/sweaters\"\>Sweaters\<\/a\>/', $html);
 
+        $html = $nested->active('sweaters', 'black-sweaters')->renderAsHtml();
+        $this->assertRegExp('/\<li\s+?class=\"active\"\><a\s+?href=\".*\/sweaters\"\>Sweaters\<\/a\>/', $html);
+
+        $html = $nested->active(['sweaters'])->renderAsHtml();
+        $this->assertRegExp('/\<li\s+?class=\"active\"\><a\s+?href=\".*\/sweaters\"\>Sweaters\<\/a\>/', $html);
+
+        $html = $nested->active(function ($li, $href, $label) {
+            $li->addAttr('data-label', 'label');
+        })->renderAsHtml();
+        $this->assertRegExp('/\<li\s+?data\-label=\"label\"\><a\s+?href=\".*\/sweaters\"\>Sweaters\<\/a\>/', $html);
     }
 
     public function testUlAttr()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
         $html = $nested->ulAttr(['class' => 'nav-bar'])->renderAsHtml();
         $this->assertRegExp('/'.$this->_get_pattern('attribute_pattern_for_ul').'/', $html);
@@ -132,7 +139,7 @@ class NestableServiceTest extends TestCase {
 
     public function testRoute()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $html = $nested->route(['category' => 'slug'])->renderAsHtml();
@@ -142,7 +149,7 @@ class NestableServiceTest extends TestCase {
 
     public function testIsValidForArray()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $this->assertTrue($nested->isValidForArray());
@@ -157,18 +164,16 @@ class NestableServiceTest extends TestCase {
 
         $parent_id = $this->_get_random_parent_id($iteratorArray);
 
-        if($parent_id) {
-
+        if ($parent_id) {
             $result = $this->_helper_recursive($nested, $parent_id);
 
             $this->assertGreaterThan(0, $result);
-
         }
     }
 
     public function testIsValidForJson()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $this->assertTrue($nested->isValidForJson());
@@ -184,7 +189,7 @@ class NestableServiceTest extends TestCase {
 
     public function testIsValidForHtml()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $this->assertTrue($nested->isValidForHtml());
@@ -194,7 +199,7 @@ class NestableServiceTest extends TestCase {
 
     public function testIsValidForDropdown()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $this->assertTrue($nested->isValidForDropdown());
@@ -204,7 +209,7 @@ class NestableServiceTest extends TestCase {
 
     public function testIsValidForMultiple()
     {
-        $nestable = new \Nestable\Services\NestableService;
+        $nestable = new \Nestable\Services\NestableService();
         $nested = $nestable->make($this->categories);
 
         $this->assertTrue($nested->isValidForMultiple());

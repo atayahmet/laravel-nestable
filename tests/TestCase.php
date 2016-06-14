@@ -1,16 +1,16 @@
-<?php namespace Nestable\Tests;
+<?php
+
+namespace Nestable\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
-
 use RecursiveArrayIterator;
 
-abstract class TestCase extends OrchestraTestCase {
-
+abstract class TestCase extends OrchestraTestCase
+{
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
+     * @param \Illuminate\Foundation\Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -27,33 +27,29 @@ abstract class TestCase extends OrchestraTestCase {
     protected function getPackageAliases($app)
     {
         return [
-            'Nestable' => \Nestable\Facades\NestableService::class
+            'Nestable' => \Nestable\Facades\NestableService::class,
         ];
     }
 
     protected function _get_random_parent_id(RecursiveArrayIterator $iteratorArray)
     {
-        $loop = rand(0,2);
+        $loop = rand(0, 2);
         $parent_id = false;
 
         while ($iteratorArray->valid()) {
-
             if ($iteratorArray->hasChildren()) {
-
                 foreach ($iteratorArray->getChildren() as $key => $value) {
-
-                    if($parent_id){
+                    if ($parent_id) {
                         break;
                     }
 
-                    if(is_array($value)) {
-                        $rand = rand(0, count($value)-1);
+                    if (is_array($value)) {
+                        $rand = rand(0, count($value) - 1);
 
-                        if(isset($value[$rand]['parent_id'])) {
+                        if (isset($value[$rand]['parent_id'])) {
                             $parent_id = $value[$rand]['parent_id'];
                         }
                     }
-
                 }
             }
             $iteratorArray->next();
@@ -64,16 +60,14 @@ abstract class TestCase extends OrchestraTestCase {
 
     protected function _helper_recursive(array $nested, $parent_id, $total = 0)
     {
-        foreach($nested as $key => $category) {
-
-            if(isset($category['parent_id']) && (int)$category['parent_id'] == (int)$parent_id) {
-                $total++;
-            }else{
-                if(isset($category['child']) && count($category['child']) > 0) {
+        foreach ($nested as $key => $category) {
+            if (isset($category['parent_id']) && (int) $category['parent_id'] == (int) $parent_id) {
+                ++$total;
+            } else {
+                if (isset($category['child']) && count($category['child']) > 0) {
                     $total += $this->_helper_recursive($category['child'], $parent_id, $total);
                 }
             }
-
         }
 
         return $total;
@@ -83,89 +77,94 @@ abstract class TestCase extends OrchestraTestCase {
     {
         return [
             [
-                'id'        => 1,
+                'id' => 1,
                 'parent_id' => 0,
-                'name'      => 'Sweaters',
-                'slug'      => 'sweaters'
+                'name' => 'Sweaters',
+                'slug' => 'sweaters',
             ],
             [
-                'id'        => 2,
+                'id' => 2,
                 'parent_id' => 1,
-                'name'      => 'Black Sweaters',
-                'slug'      => 'black-sweaters'
+                'name' => 'Black Sweaters',
+                'slug' => 'black-sweaters',
             ],
             [
-                'id'        => 3,
+                'id' => 3,
                 'parent_id' => 1,
-                'name'      => 'Yellow Sweaters',
-                'slug'      => 'yellow-sweaters'
+                'name' => 'Yellow Sweaters',
+                'slug' => 'yellow-sweaters',
             ],
             [
-                'id'        => 4,
+                'id' => 4,
                 'parent_id' => 1,
-                'name'      => 'Blue Sweaters',
-                'slug'      => 'blue-sweaters'
+                'name' => 'Blue Sweaters',
+                'slug' => 'blue-sweaters',
             ],
             [
-                'id'        => 5,
+                'id' => 5,
                 'parent_id' => 4,
-                'name'      => 'Light Blue Sweaters',
-                'slug'      => 'light-blue-sweaters'
+                'name' => 'Light Blue Sweaters',
+                'slug' => 'light-blue-sweaters',
             ],
             [
-                'id'        => 6,
+                'id' => 6,
                 'parent_id' => 0,
-                'name'      => 'T-Shirts',
-                'slug'      => 't-shirts'
+                'name' => 'T-Shirts',
+                'slug' => 't-shirts',
             ],
             [
-                'id'        => 7,
+                'id' => 7,
                 'parent_id' => 6,
-                'name'      => 'Black T-Shirts',
-                'slug'      => 'black-t-shirts'
+                'name' => 'Black T-Shirts',
+                'slug' => 'black-t-shirts',
             ],
             [
-                'id'        => 8,
+                'id' => 8,
                 'parent_id' => 6,
-                'name'      => 'Yellow T-Shirts',
-                'slug'      => 'yellow-t-shirts'
+                'name' => 'Yellow T-Shirts',
+                'slug' => 'yellow-t-shirts',
             ],
             [
-                'id'        => 9,
+                'id' => 9,
                 'parent_id' => 6,
-                'name'      => 'Blue T-Shirts',
-                'slug'      => 'blue-t-shirts'
+                'name' => 'Blue T-Shirts',
+                'slug' => 'blue-t-shirts',
             ],
             [
-                'id'        => 10,
+                'id' => 10,
                 'parent_id' => 6,
-                'name'      => 'Light Blue T-Shirts',
-                'slug'      => 'light-blue-t-shirts'
-            ]
+                'name' => 'Light Blue T-Shirts',
+                'slug' => 'light-blue-t-shirts',
+            ],
         ];
     }
 
     protected function _get_pattern($type)
     {
-        switch($type) {
+        switch ($type) {
 
-            case "html";
+            case 'html';
+
                 return '\<ul\>\s+\<li\s+?\>\<a\s+?href\=\"https?:\/\/.*\"\>.*\<\/a\>(\<ul\>\s+?\<li\s+?\>.*\<\/li\>)?';
                 break;
 
-            case "multiple";
+            case 'multiple';
+
                 return '\<select\s+?multiple\>(\<option\s+?value\=\".*?\"\>.*\<\/option\>)\<\/select\>';
                 break;
 
-            case "dropdown";
+            case 'dropdown';
+
                 return '\<select\s+?\>(\<option\s+?value\=\".*?\"\>.*\<\/option\>)\<\/select\>';
                 break;
 
-            case "dropdown_single_option";
+            case 'dropdown_single_option';
+
                 return "(\<option.*?\>.*?\<\/option\>){1}";
                 break;
 
-            case "attribute_pattern_for_ul";
+            case 'attribute_pattern_for_ul';
+
                 return "(\<ul\s+[a-zA-Z]+\=\".*?\">)";
                 break;
         }

@@ -1,4 +1,6 @@
-<?php namespace Nestable;
+<?php
+
+namespace Nestable;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -6,8 +8,6 @@ class NestableServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -18,8 +18,6 @@ class NestableServiceProvider extends ServiceProvider
 
     /**
      * Register the application services.
-     *
-     * @return void
      */
     public function register()
     {
