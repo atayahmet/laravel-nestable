@@ -648,9 +648,9 @@ class NestableService
                 if ($this->route instanceof Closure) {
                     return call_user_func_array($this->route, [$path, $label]);
                 } else {
+                    end($this->route);
                     $param = current($this->route);
                     $name = key($this->route);
-
                     return URL::route($name, [$param => $path]);
                 }
             }
