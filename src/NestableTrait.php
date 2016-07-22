@@ -218,7 +218,9 @@ trait NestableTrait
             list($key, $val) = $value;
             static::$parameters[$method][$key] = $val;
         } elseif (is_array($value)) {
-            static::$parameters[$method][key($value)] = current($value);
+            foreach ($value as $key => $attr) {
+                static::$parameters[$method][$key] = $attr;
+            }
         }
 
         return $this;
