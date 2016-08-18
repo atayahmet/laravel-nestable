@@ -254,13 +254,15 @@ trait NestableTrait
             return $this;
         }
 
-        $result = parent::__call($method, $args);
+        $parentResult = parent::__call($method, $args);
 
-        if ($result instanceof Builder) {
-            static::$_instance = $result;
+        if ($parentResult instanceof Builder) {
+            static::$_instance = $parentResult;
+
+            return $this;
         }
 
-        return $this;
+        return $parentResult;
     }
 
     /**
