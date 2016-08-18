@@ -266,6 +266,18 @@ trait NestableTrait
     }
 
     /**
+     * Call the parent delete method
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function delete()
+    {
+        return static::$_instance->delete();
+    }
+
+    /**
      * Create new instance and call the method.
      *
      * @param array $method
