@@ -26,10 +26,10 @@
         "psr-4": {
             "Nestable\\": "src/",
             "Nestable\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+          "src/helpers.php"
+        ],
     },
-    "files": [
-      "src/helpers.php"
-    ],
     "minimum-stability": "dev"
 }
