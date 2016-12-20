@@ -97,6 +97,7 @@ trait NestableTrait
         // if exists the where or similar things in the query
         // call the from instance
         if (static::$_instance instanceof Builder) {
+
             $this->source = static::$_instance->get();
         } else {
             // if not call the parent directly
@@ -214,13 +215,12 @@ trait NestableTrait
 
         if ($value instanceof Closure) {
             static::$parameters[$method]['callback'] = $value;
-        } elseif (isset($value[0])) {
-            list($key, $val) = $value;
-            static::$parameters[$method][$key] = $val;
         } elseif (is_array($value)) {
             foreach ($value as $key => $attr) {
                 static::$parameters[$method][$key] = $attr;
             }
+        }else{
+            static::$parameters[$method][] = $value;
         }
 
         return $this;
@@ -234,6 +234,33 @@ trait NestableTrait
     protected function getParameters()
     {
         return $this->paremeters;
+    }
+
+    /**
+     * Call the parent where method
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public static function where($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        return parent::query()->where($column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Call the parent delete method
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function delete()
+    {
+        if (static::$_instance instanceof Builder) {
+            return static::$_instance->delete();
+        }
+        return parent::delete();
     }
 
     /**
@@ -263,18 +290,6 @@ trait NestableTrait
         }
 
         return $parentResult;
-    }
-
-    /**
-     * Call the parent delete method
-     *
-     * @return bool|null
-     *
-     * @throws \Exception
-     */
-    public function delete()
-    {
-        return static::$_instance->delete();
     }
 
     /**
