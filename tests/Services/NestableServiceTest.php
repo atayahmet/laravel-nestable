@@ -101,6 +101,16 @@ class NestableServiceTest extends TestCase
         $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"2\"\>/', $dropdown);
     }
 
+    public function testPlaceholder()
+    {
+        $nestable = new \Nestable\Services\NestableService();
+        $nested = $nestable->make($this->categories);
+
+        $dropdown = $nested->placeholder('', '-- Please Choose --')->renderAsDropdown();
+
+        $this->assertRegExp('/\<option\s+?value=\"\"\>-- Please Choose --\<\/option\>/', $dropdown);
+    }
+
     public function testParent()
     {
         $nestable = new \Nestable\Services\NestableService();

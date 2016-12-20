@@ -223,6 +223,7 @@ name                  | paremeter         | description
 ----------------------| ----------------- | --------------------------------
 [parent()](#parent)   | int               | Get childs of the defined parent
 [selected()](#selected)| callback/array/int| Selected item(s) for dropdown  
+[placeholder()](#placeholder)| string, mixed| Set a placeholder
 [attr()](#attr)        | array             | Dropdown/listbox attributes
 
 
@@ -384,6 +385,16 @@ Category::selected(function($option, $value, $label) {
 })->renderAsMultiple();
 ```
 
+placeholder()
+---
+
+Add a placeholder.
+
+Example:
+```php
+<?php
+Category::placeholder('', '-- Please Choose --')->renderAsDropdown();
+```
 attr()
 ---
 Dropdown/listbox attributes.

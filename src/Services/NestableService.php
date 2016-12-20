@@ -50,6 +50,13 @@ class NestableService
     protected $selected = false;
 
     /**
+     * Dropdown placeholder
+     *
+     * @var array
+     */
+    protected $placeholder = [];
+
+    /**
      * Dropdown or Listbox item attributes.
      *
      * @var array
@@ -281,18 +288,23 @@ class NestableService
     {
         $args = $this->setParameters(func_get_args());
 
+        $tree = '';
+
         // open the select tag
         if ($first) {
             $tree = $first ? '<select '.$this->addAttributes().' ' : '';
         }
-
         // if pass array data to selected method procces will generate multiple dropdown menu.
-        if ($first && (is_array($this->selected) || $this->multiple == true)) {
+        if ($first && (count($this->selected) > 1 || $this->multiple == true)) {
             $tree .= ' multiple';
         }
 
         if ($first) {
-            $tree .= $first ? '>' : '';
+            $tree .= '>';
+
+            if(current($this->placeholder)) {
+                $tree .= '<option value="'.key($this->placeholder).'">' . current($this->placeholder) . '</option>';
+            }
         }
 
         $args['data']->each(function ($child_item) use (&$tree, $args, $level) {
@@ -419,6 +431,21 @@ class NestableService
         if (func_num_args() > 1) {
             $this->selected = func_get_args();
         }
+
+        return $this;
+    }
+
+    /**
+     * Set dropdown placeholder
+     *
+     * @param string $value
+     * @param string|int $label
+     *
+     * @return object (instance)
+     */
+    public function placeholder($value = '', $label = '')
+    {
+        $this->placeholder[$value] = $label;
 
         return $this;
     }
