@@ -235,9 +235,12 @@ class NestableService
                 $path = $child_item[$this->config['html']['href']];
                 $label = $child_item[$this->config['html']['label']];
 
+                // find parent element
+                $parentNode = $args['data']->where('id', (int)$child_item[$this->config['parent']])->first();
+
                 $currentData = [
                     'label' => $label,
-                    'href' => $this->url($path, $label),
+                    'href' => $this->url($path, $label, $parentNode)
                 ];
 
                 // Check the active item
@@ -668,12 +671,13 @@ class NestableService
      *
      * @return string
      */
-    protected function url($path, $label)
+    protected function url($path, $label, $parent = null)
     {
         if ($this->config['generate_url']) {
             if ($this->route) {
-                if ($this->route instanceof Closure) {
-                    return call_user_func_array($this->route, [$path, $label]);
+                if (array_has($this->route, 'callback')) {
+                    if(is_array($parent)) $parent = (object)$parent;
+                    return call_user_func_array($this->route['callback'], [$path, $label, $parent]);
                 } else {
                     end($this->route);
                     $param = current($this->route);
