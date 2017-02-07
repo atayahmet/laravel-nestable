@@ -11,7 +11,7 @@ before_script:
   - composer self-update
   - composer install --prefer-source --no-interaction --dev
 
-script: phpunit --configuration phpunit.xml --coverage-text
+script: vendor/bin/phpunit --configuration phpunit.xml --coverage-text
 
 matrix:
   allow_failures:

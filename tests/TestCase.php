@@ -21,7 +21,7 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function getPackageProviders($app)
     {
-        return [\Nestable\NestableServiceProvider::class];
+        return [\Nestable\NestableServiceProvider::class, \Orchestra\Database\ConsoleServiceProvider::class];
     }
 
     protected function getPackageAliases($app)
