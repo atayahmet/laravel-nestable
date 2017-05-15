@@ -157,6 +157,16 @@ class NestableServiceTest extends TestCase
         $this->assertRegExp('/http\:\/\/localhost\/category\/.*/', $html);
     }
 
+    public function testCustomUrl()
+    {
+        $nestable = new \Nestable\Services\NestableService();
+        $nested = $nestable->make($this->categories);
+
+        $html = $nested->customUrl('product/{slug}/detail')->renderAsHtml();
+
+        $this->assertRegExp('/http\:\/\/localhost\/product\/.*\/detail/', $html);
+    }
+
     public function testIsValidForArray()
     {
         $nestable = new \Nestable\Services\NestableService();

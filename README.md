@@ -216,6 +216,7 @@ name                  | paremeter         | description
 [active()](#active)   | callback/array/int| Selected item(s) for html output
 [ulAttr()](#ulAttr)   | array/string      | Add attribute to parent ul element
 [route()](#route)     | callback/array    | Generate url by route name
+[customUrl()](#custom-url)     | string    | Generate custom url 
 
 renderAsDropdown()/renderAsMultiple()
 ---
@@ -346,6 +347,27 @@ Menu::route(function($href, $label, $parent) {
 
 })->renderAsHtml();
 ```
+
+customUrl()
+---
+Generate custom url with slug
+
+
+Example 1:
+```php
+<?php
+
+Menu::customUrl('product/detail/{slug}')->renderAsHtml();
+```
+
+Example 1:
+```php
+<?php
+
+Menu::customUrl('product/{slug}/detail')->renderAsHtml();
+```
+
+>**Note:** **slug** keyword belongs to html > href in config file.
 
 selected()
 ---

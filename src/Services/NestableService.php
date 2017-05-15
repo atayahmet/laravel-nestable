@@ -93,6 +93,8 @@ class NestableService
      */
     protected $route = false;
 
+    protected $customUrl;
+
     /**
      * Set the data to wrap class.
      *
@@ -240,7 +242,7 @@ class NestableService
 
                 $currentData = [
                     'label' => $label,
-                    'href' => $this->url($path, $label, $parentNode)
+                    'href' => $this->customUrl ? $this->makeUrl($path) : $this->url($path, $label, $parentNode)
                 ];
 
                 // Check the active item
@@ -702,6 +704,30 @@ class NestableService
         $this->route = $route;
 
         return $this;
+    }
+
+    /**
+     * Make custom url
+     * 
+     * @param string $url 
+     * @return type
+     */
+    public function customUrl($url)
+    {
+        $this->customUrl = $url;
+
+        return $this;        
+    }
+
+    /**
+     * Generate custom url
+     * 
+     * @param string $path 
+     * @return type
+     */
+    protected function makeUrl($path)
+    {
+        return URL::to(str_replace('{'.$this->config['html']['href'].'}', $path, $this->customUrl));
     }
 
     /**
