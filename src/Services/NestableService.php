@@ -612,6 +612,8 @@ class NestableService
             $this->optionUlAttr[$attr] = $value;
         } elseif (is_array($attr)) {
             $this->optionUlAttr = $attr;
+        }else if (is_callable($attr)) {
+            $this->optionUlAttr['callback'] = $attr;
         }
 
         return $this;
