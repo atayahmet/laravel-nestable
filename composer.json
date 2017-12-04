@@ -32,5 +32,15 @@
           "src/helpers.php"
         ]
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nestable\\NestableServiceProvider::class"
+            ],
+            "aliases": {
+                "Nestable": "Nestable\\Facades\\NestableService"
+            }
+        }
+    },
     "minimum-stability": "dev"
 }
