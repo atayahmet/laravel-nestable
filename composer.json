@@ -35,7 +35,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Nestable\\NestableServiceProvider::class"
+                "Nestable\\NestableServiceProvider"
             ],
             "aliases": {
                 "Nestable": "Nestable\\Facades\\NestableService"
