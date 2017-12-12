@@ -403,7 +403,7 @@ class NestableService
      */
     public function hasChild($key = null, $value = null, Collect $data = null)
     {
-        if (count(func_num_args()) < 3) {
+        if (func_num_args() < 3) {
             $data = $this->data;
             $key = $this->parent;
             $value = current(func_get_args());
