@@ -161,6 +161,18 @@ class NestableServiceTest extends TestCase
         $this->assertRegExp('/'.$this->_get_pattern('attribute_pattern_for_ul').'/', $html);
     }
 
+    public function testFirstUlAttr() {
+        $nestable = new \Nestable\Services\NestableService();
+        
+        $nested = $nestable->make($this->categories);
+        $html = $nested->firstUlAttr('class', 'first-item')->renderAsHtml();
+        $this->assertRegExp('/'.$this->_get_pattern('html-first-item').'/', $html);
+
+        $nested = $nestable->make($this->categories);
+        $html = $nested->firstUlAttr(['class' => 'first-item'])->renderAsHtml();
+        $this->assertRegExp('/'.$this->_get_pattern('html-first-item').'/', $html);
+    }
+
     public function testRoute()
     {
         $nestable = new \Nestable\Services\NestableService();

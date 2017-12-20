@@ -63,7 +63,19 @@ class NestableService
      */
     protected $optionAttr = null;
 
-    protected $optionUlAttr = null;
+    /**
+     * Dropdown option attributes
+     *
+     * @var array
+     */
+    protected $optionUlAttr = [];
+
+    /**
+     * First ul element attributes
+     *
+     * @var array
+     */
+    protected $firstUlAttrs = [];
 
     /**
      * Selectable values for html output.
@@ -93,6 +105,11 @@ class NestableService
      */
     protected $route = false;
 
+    /**
+     * Custom url.
+     *
+     * @var string
+     */
     protected $customUrl;
 
     /**
@@ -227,7 +244,7 @@ class NestableService
         $args = $this->setParameters(func_get_args());
 
         // open the ul tag if function is first run
-        $tree = $first ? $this->ul(null, $parent) : '';
+        $tree = $first ? $this->ul(null, $parent, true) : '';
 
         $args['data']->each(function ($child_item) use (&$tree, $args) {
 
@@ -624,6 +641,24 @@ class NestableService
     }
 
     /**
+     * Add attribute to first <ul> element.
+     *
+     * @param mixed $attr
+     * @param mixed $value
+     *
+     * @return object (instance)
+     */
+    public function firstUlAttr($attr, $value = '') {
+        if (func_num_args() > 1) {
+            $this->firstUlAttrs[$attr] = $value;
+        } elseif (is_array($attr)) {
+            $this->firstUlAttrs = $attr;
+        }
+
+        return $this;
+    }
+
+    /**
      * Render the attritues of html elements.
      *
      * @param mixed $attributes
@@ -743,12 +778,15 @@ class NestableService
      *
      * @return string
      */
-    public function ul($items = false, $parent_id = 0)
+    public function ul($items = false, $parent_id = 0, $first = false)
     {
         $attrs = '';
 
-        if (is_array($this->optionUlAttr) && count($this->optionUlAttr) > 0) {
+        if (! $first && is_array($this->optionUlAttr) && count($this->optionUlAttr) > 0) {
             $attrs = $this->renderAttr($this->optionUlAttr, $parent_id);
+        }
+        else if($first && count($this->firstUlAttrs) > 0) {
+            $attrs = $this->renderAttr($this->firstUlAttrs, $parent_id);
         }
 
         if (!$items) {

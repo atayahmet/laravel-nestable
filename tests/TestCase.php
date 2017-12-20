@@ -144,27 +144,26 @@ abstract class TestCase extends OrchestraTestCase
         switch ($type) {
 
             case 'html';
+                return '\<ul.*\>\s+\<li\s+?\>\<a\s+?href\=\"https?:\/\/.*\"\>.*\<\/a\>(\<ul\>\s+?\<li\s+?\>.*\<\/li\>)?';
+                break;
 
-                return '\<ul\>\s+\<li\s+?\>\<a\s+?href\=\"https?:\/\/.*\"\>.*\<\/a\>(\<ul\>\s+?\<li\s+?\>.*\<\/li\>)?';
+                case 'html-first-item';
+                return '\<ul class="first-item"\>\s+\<li\s+?\>\<a\s+?href\=\"https?:\/\/.*\"\>.*\<\/a\>(\<ul\>\s+?\<li\s+?\>.*\<\/li\>)?';
                 break;
 
             case 'multiple';
-
                 return '\<select\s+?multiple\>(\<option\s+?value\=\".*?\"\>.*\<\/option\>)\<\/select\>';
                 break;
 
             case 'dropdown';
-
                 return '\<select\s+?\>(\<option\s+?value\=\".*?\"\>.*\<\/option\>)\<\/select\>';
                 break;
 
             case 'dropdown_single_option';
-
                 return "(\<option.*?\>.*?\<\/option\>){1}";
                 break;
 
             case 'attribute_pattern_for_ul';
-
                 return "(\<ul\s+[a-zA-Z]+\=\".*?\">)";
                 break;
         }

@@ -215,6 +215,7 @@ name                  | paremeter         | description
 [parent()](#parent)   | int               | Get childs of the defined parent
 [active()](#active)   | callback/array/int| Selected item(s) for html output
 [ulAttr()](#ulAttr)   | array/string      | Add attribute to parent ul element
+[firstUlAttr()](#firstUlAttr)   | array/string      | Add attribute to parent ul element
 [route()](#route)     | callback/array    | Generate url by route name
 [customUrl()](#custom-url)     | string    | Generate custom url 
 
@@ -284,6 +285,24 @@ Menu::active(function($li, $href, $label) {
     $li->addAttr(['class' => 'active', 'data-label' => $label]);
 
 })->renderAsHtml();
+```
+
+firstUlAttr()
+---
+Add attribute to first ul element
+
+Example 1:
+```php
+<?php
+
+Menu::firstUlAttr('class', 'first-ul')->renderAsHtml();
+```
+
+Example 2:
+```php
+<?php
+
+Menu::firstUlAttr(['class' => 'first-ul'])->renderAsHtml();
 ```
 
 ulAttr()
