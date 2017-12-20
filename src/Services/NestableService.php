@@ -47,7 +47,7 @@ class NestableService
      *
      * @var mixed
      */
-    protected $selected = false;
+    protected $selected = [];
 
     /**
      * Dropdown placeholder
@@ -300,7 +300,7 @@ class NestableService
             $tree = $first ? '<select '.$this->addAttributes().' ' : '';
         }
         // if pass array data to selected method procces will generate multiple dropdown menu.
-        if ($first && (count($this->selected) > 1 || $this->multiple == true)) {
+        if ($first && $this->multiple == true) {
             $tree .= ' multiple';
         }
 
@@ -431,10 +431,13 @@ class NestableService
      */
     public function selected($values)
     {
-        $this->selected = $values;
-
-        if (func_num_args() > 1) {
+        if (is_array($values) || $values instanceof Closure) {
+            $this->selected = $values;
+        }
+        else if (func_num_args() > 1) {
             $this->selected = func_get_args();
+        } else {
+            $this->selected = [$values];
         }
 
         return $this;
@@ -563,12 +566,13 @@ class NestableService
                 if ($result !== false) {
                     unset($this->selected[$result]);
 
-                    return 'selected';
+                    return 'selected="selected"';
                 }
             } elseif ($this->selected instanceof Closure) {
                 call_user_func_array($this->selected, [$this, $value, $label]);
                 $attrs = $this->renderAttr($this->optionAttr);
                 $this->optionAttr = null;
+                return $attrs;
             } else {
                 if ($this->selected == $value) {
                     $this->selected = null;

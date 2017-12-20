@@ -99,6 +99,20 @@ class NestableServiceTest extends TestCase
         $dropdown = $nested->selected(2)->renderAsDropdown();
 
         $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"2\"\>/', $dropdown);
+
+        $nested = $nestable->make($this->categories);
+        $dropdown = $nested->selected(2, 3, 4, 6)->renderAsMultiple();
+        $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"2\"\>/', $dropdown);
+        $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"3\"\>/', $dropdown);
+        $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"4\"\>/', $dropdown);
+        $this->assertRegExp('/\<option\s+?selected="selected"\s+value=\"6\"\>/', $dropdown);
+
+        $nested = $nestable->make($this->categories);
+        $dropdown = $nested->selected(function($option, $value, $label) {
+            if ($label === 'Light Blue T-Shirts') $option->addAttr('selected', 'true');
+        })->renderAsMultiple();
+
+        $this->assertRegExp('/\<option\s+?selected="true".*\>/', $dropdown);        
     }
 
     public function testPlaceholder()
