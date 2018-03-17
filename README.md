@@ -191,7 +191,7 @@ renderAsArray()       | none      | array
 renderAsJson()        | none      | json    
 renderAsHtml()        | none      | html    
 renderAsDropdown()    | none      | dropdown
-renderAsDropdown()    | none      | Listbox
+renderAsMultiple()    | none      | Listbox
 
 Usable methods with output methods
 ---
