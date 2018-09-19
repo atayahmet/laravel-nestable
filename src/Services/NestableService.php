@@ -742,28 +742,28 @@ class NestableService
      */
     public function route($route)
     {
-        $this->route = $route;
+        $this->route = is_callable($route) ? ['callback' => $route] : $route;
 
         return $this;
     }
 
     /**
      * Make custom url
-     * 
-     * @param string $url 
+     *
+     * @param string $url
      * @return type
      */
     public function customUrl($url)
     {
         $this->customUrl = $url;
 
-        return $this;        
+        return $this;
     }
 
     /**
      * Generate custom url
-     * 
-     * @param string $path 
+     *
+     * @param string $path
      * @return type
      */
     protected function makeUrl($path)
